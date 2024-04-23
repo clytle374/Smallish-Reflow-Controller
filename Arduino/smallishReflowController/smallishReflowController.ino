@@ -1,5 +1,6 @@
+#define version 31
+
 /*Title: Smallish Reflow Controller
-  Version: .10
   Date: 03-31-2024
   Author: Cory Lytle  KO4SWI
 
@@ -35,9 +36,10 @@
   smallish-reflow-controller 28 more variable changes and refactoring, next changes will break
                     //the program so saving here.
   smallish-reflow-controller 29  seems to work with variables changed. menus and hardcoded stuff need fixed
-                  
+
+  V31 organizing and commenting                 
   */
-#define version 30
+
 
 //*****************************************************
 //********* how are we going to watchdog this?  *******
@@ -81,79 +83,79 @@
 #define ROHS_SOAK_TEMP_HOLDOFF 1
 
 #define LF_SOAK_TEMP 150             //soak set temp
-#define ROHS_SOAK_TEMP 2
+#define ROHS_SOAK_TEMP 2            //^^ parameter number 
 #define LF_SOAK_TIME 60000  //set soak time
-#define ROHS_SOAK_TIME 3
+#define ROHS_SOAK_TIME 3    //^^ parameter number
 #define LF_SOAK_RAMP_TEMP 0  //do we want to ramp tem pduring soak?
-#define ROHS_SOAK_TEMP_RAMP 4
+#define ROHS_SOAK_TEMP_RAMP 4 //^^ parameter number
 #define LF_REFLOW_TEMP_HOLFOFF 20  //cut heater off before reflow temp
-#define ROHS_REFLOW_TEMP_HOLDOFF 5
+#define ROHS_REFLOW_TEMP_HOLDOFF 5 //^^ parameter number
 
 #define LF__REFLOW_TEMP 250            //reflow temp
-#define ROHS_REFLOW_TEMP 6
+#define ROHS_REFLOW_TEMP 6              //^^ parameter number
 #define LF_REFLOW_TIME 6000  //reflow time
-#define ROHS_REFLOW_TIME 7
+#define ROHS_REFLOW_TIME 7    //^^ parameter number
 
 // ***** LEADED PROFILE CONSTANTS *****
 #define PB_SOAK_TEMP_HOLDOFF 25  //cut heater before reaching soak
-#define LEAD_SOAK_TEMP_HOLDOFF 8
+#define LEAD_SOAK_TEMP_HOLDOFF 8  //^^ parameter number
 
-#define PB_SOAK_TEMP 150             //temp to soak
-#define LEAD_SOAK_TEMP 9
+#define PB_SOAK_TEMP 150        //temp to soak
+#define LEAD_SOAK_TEMP 9        //^^ parameter number
 #define PB_SOAK_TIME 60000  //time to soak
-#define LEAD_SOAK_TIME 10
+#define LEAD_SOAK_TIME 10   //^^ parameter number          
 #define PB_SOAK_RAMP_TEMP 0  //do we want to ramp tem pduring soak?
-#define LEAD_SOAK_TEMP_RAMP 11
+#define LEAD_SOAK_TEMP_RAMP 11  //^^ parameter number
 #define PB_REFLOW_TEMO_HOLDOFF 25  //cut heater before reflow
-#define LEAD_REFLOW_TEMP_HOLDOFF 12
+#define LEAD_REFLOW_TEMP_HOLDOFF 12 //^^ parameter number
 #define PB_REFLOW_TEMP 224  //reflow temp
-#define LEAD_REFLOW_TEMP 13
+#define LEAD_REFLOW_TEMP 13 //^^ parameter number
 #define PB_REFLOW_TIME 60000  //reflow time
-#define LEAD_REFLOW_TIME 14
+#define LEAD_REFLOW_TIME 14   //^^ parameter number
 
 
 // ***** PID PARAMETERS *****
 // ***** PRE-HEAT STAGE MAIN ELEMENT*****
 #define PID_KP_PREHEAT_MAIN 200  //parameter10
-#define PID_P_PREHEAT 15
+#define PID_P_PREHEAT 15        //^^ parameter number
 #define PID_KI_PREHEAT_MAIN 0.025  //parameter11
-#define PID_I_PREHEAT 16
+#define PID_I_PREHEAT 16          //^^ parameter number
 #define PID_KD_PREHEAT_MAIN 100  //parameter12
-#define PID_D_PREHEAT 17
+#define PID_D_PREHEAT 17         //^^ parameter number
 // ***** PRE-HEAT STAGE BOOST ELEMENT*****
 
 
 // ***** SOAKING STAGE *****
 // ***** SOAK STAGE MAIN ELEMENT*****
 #define PID_KP_SOAK_MAIN 200  //parameter16
-#define PID_P_SOAK 18
+#define PID_P_SOAK 18         //^^ parameter number
 #define PID_KI_SOAK_MAIN 0.05  // parameter17
-#define PID_I_SOAK 19
+#define PID_I_SOAK 19         //^^ parameter number
 #define PID_KD_SOAK_MAIN 100  //parameter18
-#define PID_D_SOAK 20
+#define PID_D_SOAK 20         //^^ parameter number
 // ***** SOAK STAGE BOOST ELEMENT*****
 
 
 //\ ***** REFLOW STAGE *****
 // ***** REFLOW STAGE MAIN ELEMENT*****
 #define PID_KP_REFLOW_MAIN 150  // parameter22
-#define PID_P_REFLOW 21
+#define PID_P_REFLOW 21         //^^ parameter number
 #define PID_KI_REFLOW_MAIN 0.025  //parameter23
-#define PID_I_REFLOW 22
+#define PID_I_REFLOW 22           //^^ parameter number
 #define PID_KD_REFLOW_MAIN 100  //parameter24
-#define PID_D_REFLOW 23
+#define PID_D_REFLOW 23         //^^ parameter number
 // ***** REFLOW STAGE BOOST ELEMENT*****
 
 
 // parameter   (not implementing?)
 #define MAX_ON_MAIN 100  // % limit max ontime of element 0-100 // parameter28
-#define MAX_HEATER_ON 24
+#define MAX_HEATER_ON 24  //^^ parameter number
 
 #define TEMPERATURE_COOL_MIN 100  //min temp to complete cool
-#define COOL_TEMP 25
+#define COOL_TEMP 25            //^^ parameter number
 // ****** serial speed ********
 #define SERIAL_SPEED 115200  //serial com speed parameter 36
-#define SERIAL_BAUD 26
+#define SERIAL_BAUD 26        //^^ parameter number
 
 //Pin assignments
 // ******* rotary encoder setup *****************
@@ -164,16 +166,11 @@
 #define SSR_MAIN 12   //SSR PIN
 #define LED_PIN 0     //led pin
 #define BUZZER_PIN 5  //buzzer pin
-
 #define SERVOPIN A0       //servo PWM
 #define MAX6675_CS_PIN 1  //chip select max6675 thermocouple
 
-
-
-
-
 // ***** TYPE DEFINITIONS *****
-typedef enum REFLOW_STATE {
+typedef enum REFLOW_STATE {  //states for switch statments 
   IDLE,
   PREHEAT,
   SOAK,
@@ -186,7 +183,7 @@ typedef enum REFLOW_STATE {
 } reflowState_t;
 
 //states for the reflow modes
-typedef enum CURRENT_FUNCTION {
+typedef enum CURRENT_FUNCTION {   //functions for switch statments
   INTERCEPT,
   RAMP,
   COAST,
@@ -195,13 +192,13 @@ typedef enum CURRENT_FUNCTION {
   BOOST,
 } currentFunction_t;
 
-typedef enum REFLOW_STATUS {
+typedef enum REFLOW_STATUS {    //reflow yes or no, why not bool?
   OFF,
   ON
 } reflowStatus_t;
 
 
-typedef enum REFLOW_PROFILE {
+typedef enum REFLOW_PROFILE {  //switch for ROHS, lean, Program mode 
   REFLOW_PROFILE_LEADFREE,
   REFLOW_PROFILE_LEADED,
   PROGRAM_MODE
@@ -213,39 +210,36 @@ double setpoint;
 double input = 21;  //zero will throw errors before first averaged sample
 double outputMain;  //output from PID for main element
 
-
-
-
+//unsorted parameters for whatnots
 int windowSize;
 unsigned long windowStartTime;
 unsigned long nextCheck;    // time keeping variable
 unsigned long nextRead;     //next read of thermouple
 unsigned long updateLcd;    //display update interval
-unsigned long systemTimer;  //timer for ramp functions
-unsigned long reflowTimer;  //time for relow
+unsigned long systemTimer;  //timer for running everything in run modes
 bool rampRunning = 0;       // heating element is catching up, start ramp
 unsigned long lastTemp;     //chatch if temp isn't coasting up
 unsigned long soakTimer;    //timer for soaking
-unsigned long buzzerPeriod;
-unsigned long soakTempHoldoff;  //cut before we get to temp
-unsigned long soakTemp;
-unsigned long soakTime;
-unsigned long soakTempRamp;  //are we ramping in soak
-unsigned long reflowTempHoldoff;
-unsigned long reflowTemp;
-unsigned long reflowTime;
+unsigned long reflowTimer;  //timer for relow
+unsigned long buzzerPeriod; 
 
-//unsigned long soakMicroPeriod;
-// Reflow oven controller state machine state variable
-reflowState_t reflowState;
-// Reflow oven controller status
-reflowStatus_t reflowStatus;
-// Reflow profile type
-reflowProfile_t reflowProfile;
-currentFunction_t currentFunction;
+
+//these are used to pass the diffrent ROHS or lead parameters to the system
+unsigned long soakTempHoldoff;  //cut before we get to temp
+unsigned long soakTemp;    
+unsigned long soakTempRamp;    
+unsigned long soakTime;
+unsigned long reflowTempHoldoff;
+unsigned long reflowTemp; 
+unsigned long reflowTime; 
+
+reflowState_t reflowState; // Reflow oven controller state machine state variable
+reflowStatus_t reflowStatus; // Reflow oven controller status
+reflowProfile_t reflowProfile; // Reflow profile type
+currentFunction_t currentFunction;  //functions inside each state 
 
 unsigned int timerSeconds;  // Seconds timer for serial data out, or more?
-unsigned int fault;         // Thermocouple fault status variable
+unsigned int fault;         // Thermocouple fault status variable DOESN"T WORK
 unsigned int timerUpdate;
 unsigned char temperature[SCREEN_WIDTH - X_AXIS_START];
 unsigned char x;
@@ -255,15 +249,15 @@ int programPointer = 0;  //what is the current position of the programming menu
 int lastPointer;         //save state to catch change
 int menuPointer = 10;    // move selector back to parameters
 bool edit = 1;           // sw back to edit mode
-bool menuSpecial = 0;
-int menuYes = 0;
+bool menuSpecial = 0;    // menus that behave diffrently get this 
+int menuYes = 0;         // IDK, look into this  
 const char menuOptions[][4] = { "NO", "YES" };
 //double px[31];
 
 
 
 // ***** LCD MESSAGES *****
-const char* lcdMessagesReflowStatus[] = {
+const char* lcdMessagesReflowStatus[] = {  //text for display 
   "Ready",
   "Pre",
   "Soak",
@@ -276,17 +270,7 @@ const char* lcdMessagesReflowStatus[] = {
 };
 
 //this will load the defaults parameters.. menu will use to load to defaults
-/*double defaultpx[41] = { TEMPERATURE_ROOM, TEMPERATURE_SOAK_MIN, TEMPERATURE_COOL_MIN,
-                         SOAK_TEMPERATURE_STEP, TEMPERATURE_SOAK_MAX_LF, TEMPERATURE_REFLOW_MAX_LF,
-                         SOAK_MICRO_PERIOD_LF, TEMPERATURE_SOAK_MAX_PB, TEMPERATURE_REFLOW_MAX_PB,
-                         SOAK_MICRO_PERIOD_PB, PID_KP_PREHEAT_MAIN, PID_KI_PREHEAT_MAIN, PID_KD_PREHEAT_MAIN,
-                         PID_KP_PREHEAT_BOOST, PID_KI_PREHEAT_BOOST, PID_KD_PREHEAT_BOOST, PID_KP_SOAK_MAIN,
-                         PID_KI_SOAK_MAIN, PID_KD_SOAK_MAIN, PID_KP_SOAK_BOOST, PID_KI_SOAK_BOOST,
-                         PID_KD_SOAK_BOOST, PID_KP_REFLOW_MAIN, PID_KI_REFLOW_MAIN, PID_KD_REFLOW_MAIN,
-                         PID_KP_REFLOW_BOOST, PID_KI_REFLOW_BOOST, PID_KD_REFLOW_BOOST,
-                         MAX_ON_MAIN, MAX_ON_BOOST, BOOST_ON_IF_PRE, MAIN_ON_IF_PRE, BOOST_ON_IF_SOAK,
-                         MAIN_ON_IF_SOAK, BOOST_ON_IF_REFLOW, MAIN_ON_IF_REFLOW, SERIAL_SPEED, 0, 0, 0, 0 };
-*/
+
 double defaultpx[41] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                          LF_SOAK_TIME, LF_SOAK_RAMP_TEMP, LF_REFLOW_TEMP_HOLFOFF, LF__REFLOW_TEMP,
                          LF_REFLOW_TIME, PB_SOAK_TEMP_HOLDOFF, PB_SOAK_TEMP, PB_SOAK_TIME,
@@ -295,6 +279,7 @@ double defaultpx[41] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                          PID_KI_SOAK_MAIN, PID_KD_SOAK_MAIN, PID_KP_REFLOW_MAIN, PID_KI_REFLOW_MAIN,
                          PID_KD_REFLOW_MAIN, MAX_ON_MAIN, TEMPERATURE_COOL_MIN, SERIAL_SPEED };
 
+//delete this next part when eeprom is running again. 
 double px[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                   LF_SOAK_TIME, LF_SOAK_RAMP_TEMP, LF_REFLOW_TEMP_HOLFOFF, LF__REFLOW_TEMP,
                   LF_REFLOW_TIME, PB_SOAK_TEMP_HOLDOFF, PB_SOAK_TEMP, PB_SOAK_TIME,
@@ -304,11 +289,11 @@ double px[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                   PID_KD_REFLOW_MAIN, MAX_ON_MAIN, TEMPERATURE_COOL_MIN, SERIAL_SPEED };
 
 
+int currentBaudPointer = 0;  // pointer for selecting baudrates from list, should be local?
 
-int currentBaudPointer = 0;
+//availble baud rates, did I miss anything important? 
 const double baudRates[14] = { 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600,
                                76800, 115200, 230400, 250000, 500000, 1000000 };
-
 
 // these are the texts for the menu.
 const char parameterNames[][22] = { "TEMPERATURE_ROOM", "LF_SOAK_TEMP_HOLDOFF",
@@ -321,11 +306,10 @@ const char parameterNames[][22] = { "TEMPERATURE_ROOM", "LF_SOAK_TEMP_HOLDOFF",
                                     "MAX_ON_MAIN", "TEMPERATURE_COOL_MIN", "SERIAL_SPEED", "EXIT", "DUMP_TO_SERIAL",
                                     "LOAD_DEFAULT_SETTINGS", "SAVE_TO_EEPROM" };
 
+// PID control initalize // PID values are garbage now since I can not load eeprom yet
+PID reflowOvenPIDmain(&input, &outputMain, &setpoint, 100, .025, 20, DIRECT);  
 
-
-// PID control interface
-PID reflowOvenPIDmain(&input, &outputMain, &setpoint, 100, .025, 20, DIRECT);  //loading them with garbage now since I can not
-
+//initalize oled display
 Adafruit_SSD1306 oled(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
 
 // MAX6675 thermocouple interface
@@ -346,7 +330,7 @@ void setup() {
   }
   
 
-  Serial.begin(px[SERIAL_BAUD]);
+  Serial.begin(SERIAL_SPEED); //Serial.begin(px[SERIAL_BAUD]); //something strange 
   // Check current selected reflow profile
   unsigned char value;  // = EEPROM.read(PROFILE_TYPE_ADDRESS);
   EEPROM.get(PROFILE_TYPE_ADDRESS, value);
@@ -580,20 +564,20 @@ void loop() {
       if (edit && (menuPointer == 10)) {  //handle the pointer for parameter selection
         oled.print(F("^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^"));
       } else if (!edit && (menuPointer == 10)) {
-        oled.print(F("* * * * * * * * * * "));
+        oled.print(F("* * * * * * * * * * "));  //now in move the pointer mode 
       } else {
         oled.print(F(" "));
       }
       if (menuPointer != 10) {   //are we editing parameter values?
         oled.setCursor(30, 45);  //move cursor below target data value
-        for (int i = 10; i > -1; i--) {
+        for (int i = 10; i > -1; i--) { 
           if (i == 2) {
             oled.print(F(" "));
           }
           if ((i - menuPointer) == 0) {
             if (edit) {
-              oled.print(F("^"));
-            } else if (!edit) {
+              oled.print(F("^")); //plave edit cursor ^ under proper digit. 
+            } else if (!edit) {   //place select cursor * under proper digit 
               oled.print(F("*"));
             }
           } else {
@@ -602,9 +586,9 @@ void loop() {
         }
       }
 
-      oled.setCursor(0, 54);
-      oled.print(F("Parameter #"));
-      oled.print(programPointer);
+      oled.setCursor(0, 54);     //show what parameter # is being edited 
+      oled.print(F("Parameter #"));  
+      oled.print(programPointer);  //mostly for programming debug, but nice. 
     }
 
     // Update screen
@@ -818,7 +802,7 @@ void loop() {
           break;
       //**********************Programming mode handeling
       case PROGRAM:
-        systemTimer = millis() + 100; //speed up loop for menu responce
+        systemTimer = millis() + 100; //speed up loop if in menu responce
         if (edit && menuPointer == 10) {  //are we selecting the parameters
           programPointer += encoder;      //change pointer of parameter by encoder counts
           if (programPointer < 0) {       //did we hit bottom of list?
@@ -853,13 +837,13 @@ void loop() {
 
         if (!edit && programPointer < 30) {  //are we in edit paramter values mode?
           menuPointer -= encoder;            //move pointer by encoder counts
-          if (menuPointer > 10) {            //next 4 handle rollover
+          if (menuPointer > 10) {            //next 4 handle upwards rollover
             menuPointer = 0;
           } else if (menuPointer < 0) {
             menuPointer = 10;
           }
         } else if (!edit && programPointer > 29) {
-          if (encoder != 0 && menuPointer == 10) {  //next 4 handle rollover
+          if (encoder != 0 && menuPointer == 10) {  //next 4 handle downwards  rollover
             menuPointer = 7;
           } else if (encoder != 0) {
             menuPointer = 10;
@@ -870,9 +854,9 @@ void loop() {
                                                                  //  double enc = encoder;
           menuSpecial = 0;                                       //not in special functions mode
           double Z = 0;
-          switch (menuPointer) {
-            case 0: Z = 1.0e-3; break;
-            case 1: Z = 1.0e-2; break;
+          switch (menuPointer) {            //load Z with proper value to add or
+            case 0: Z = 1.0e-3; break;      //subtract from selected place 
+            case 1: Z = 1.0e-2; break;      //ie +/- .001 to 1000000
             case 2: Z = 1.0e-1; break;
             case 3: Z = 1.0e0; break;
             case 4: Z = 1.0e1; break;
@@ -883,14 +867,14 @@ void loop() {
             case 9: Z = 1.0e6; break;
             default: Z = 0;
           }
-          px[programPointer] += (encoder * Z);  //(((pow(10,menuPointer))*.001)));
+          px[programPointer] += (encoder * Z);  // +/- encoder counts from value
           if (px[programPointer] < 0) {         //catch negative parameter value
             px[programPointer] = 0;             //if so zero it out
           }
         } else if (programPointer > 29 && edit && menuPointer != 10) {  //are we in the
-          menuSpecial = 1;                                              // special section of the menu?
-          switch (programPointer) {                                     //figure out where we are and act accordanly
-            case 30:                                                    //boost on pre
+          menuSpecial = 1;                           // special section of the menu?
+          switch (programPointer) {                  //figure out where we are and act accordanly
+            case 30:                                 //boost on pre
               if (encoder != 0) {
                 if (menuYes == 1) {
                   menuYes = 0;
