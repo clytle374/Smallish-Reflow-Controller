@@ -18,6 +18,9 @@ Here is the basic setup of the reflow profiles.  There are 2 profiles(LEAD and R
 
 
 
+![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/6c69fa6e21b77d11785d1b0f0b822d51ea9b8408/images/reflowplot.png?raw=true "Parameters and useage")
+
+
 
 This is a overview of the settings, more later on the oven and how the code works.  Preheat is set at 2C/s. If your oven cannot hold a 2C/s ramp, I am not sure this code will work out very well on your oven. The ramp will continue until the SOAK_TEMP_HOLDOFF is reached.  Its value is the degrees before SOAK_TEMP. So if SOAK_TEMP is 150C and SOAK_TEMP_HOLDOFF is 25C then the elements will cut out at 125C. Temperature overshoot will reach the SOAK_TEMP and start the timer for SOAK_TIME.  There is an option for adding in a SOAK_RAMP to increase the temp linearly over the soak cycle, setting it to 0 disables it.
 
@@ -30,7 +33,7 @@ Why use those holdoff values?  I could not tune the PID of the system to not ove
 
 I devised a gimmick.  Here is a plot of setpoint vs real value.
 
-
+![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/6c69fa6e21b77d11785d1b0f0b822d51ea9b8408/images/V35refloeResults.png?raw=true "Untuned Results")
 
 BLUE = SETPOINT   RED = Actually temperature
 
