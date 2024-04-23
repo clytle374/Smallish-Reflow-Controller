@@ -1,4 +1,4 @@
-#define version 31
+#define version 32
 
 /*Title: Smallish Reflow Controller
   Date: 03-31-2024
@@ -37,7 +37,8 @@
                     //the program so saving here.
   smallish-reflow-controller 29  seems to work with variables changed. menus and hardcoded stuff need fixed
 
-  V31 organizing and commenting                 
+  V31 organizing and commenting    
+  V32 fixing menus, some bugs(known) remain             
   */
 
 
@@ -74,6 +75,8 @@
 #define EEPROM_STORAGE_ADDRESS 1  //eeprom address for everything else
 #define SENSOR_SAMPLING_TIME 250  // time for thermocouple reads, PC data out,
 #define PID_SAMPLE_TIME 1000      //pid loop time
+
+//********** begin paramters saved in eeprom *****************
 #define TEMPERATURE_ROOM 50       //parameter 0
 #define ROOM_TEMP 0
 
@@ -81,7 +84,6 @@
 // ***** LEAD FREE PROFILE CONSTANTS *****
 #define LF_SOAK_TEMP_HOLDOFF 25  //cut heaters before reaching reflow temp
 #define ROHS_SOAK_TEMP_HOLDOFF 1
-
 #define LF_SOAK_TEMP 150             //soak set temp
 #define ROHS_SOAK_TEMP 2            //^^ parameter number 
 #define LF_SOAK_TIME 60000  //set soak time
@@ -90,7 +92,6 @@
 #define ROHS_SOAK_TEMP_RAMP 4 //^^ parameter number
 #define LF_REFLOW_TEMP_HOLFOFF 20  //cut heater off before reflow temp
 #define ROHS_REFLOW_TEMP_HOLDOFF 5 //^^ parameter number
-
 #define LF__REFLOW_TEMP 250            //reflow temp
 #define ROHS_REFLOW_TEMP 6              //^^ parameter number
 #define LF_REFLOW_TIME 6000  //reflow time
@@ -99,7 +100,6 @@
 // ***** LEADED PROFILE CONSTANTS *****
 #define PB_SOAK_TEMP_HOLDOFF 25  //cut heater before reaching soak
 #define LEAD_SOAK_TEMP_HOLDOFF 8  //^^ parameter number
-
 #define PB_SOAK_TEMP 150        //temp to soak
 #define LEAD_SOAK_TEMP 9        //^^ parameter number
 #define PB_SOAK_TIME 60000  //time to soak
@@ -115,54 +115,47 @@
 
 
 // ***** PID PARAMETERS *****
-// ***** PRE-HEAT STAGE MAIN ELEMENT*****
+// ***** PRE-HEAT *****
 #define PID_KP_PREHEAT_MAIN 200  //parameter10
 #define PID_P_PREHEAT 15        //^^ parameter number
 #define PID_KI_PREHEAT_MAIN 0.025  //parameter11
 #define PID_I_PREHEAT 16          //^^ parameter number
 #define PID_KD_PREHEAT_MAIN 100  //parameter12
 #define PID_D_PREHEAT 17         //^^ parameter number
-// ***** PRE-HEAT STAGE BOOST ELEMENT*****
 
-
-// ***** SOAKING STAGE *****
-// ***** SOAK STAGE MAIN ELEMENT*****
+// ***** SOAK *****
 #define PID_KP_SOAK_MAIN 200  //parameter16
 #define PID_P_SOAK 18         //^^ parameter number
 #define PID_KI_SOAK_MAIN 0.05  // parameter17
 #define PID_I_SOAK 19         //^^ parameter number
 #define PID_KD_SOAK_MAIN 100  //parameter18
 #define PID_D_SOAK 20         //^^ parameter number
-// ***** SOAK STAGE BOOST ELEMENT*****
 
-
-//\ ***** REFLOW STAGE *****
-// ***** REFLOW STAGE MAIN ELEMENT*****
+// ***** REFLOW STAGE *****
 #define PID_KP_REFLOW_MAIN 150  // parameter22
 #define PID_P_REFLOW 21         //^^ parameter number
 #define PID_KI_REFLOW_MAIN 0.025  //parameter23
 #define PID_I_REFLOW 22           //^^ parameter number
 #define PID_KD_REFLOW_MAIN 100  //parameter24
 #define PID_D_REFLOW 23         //^^ parameter number
-// ***** REFLOW STAGE BOOST ELEMENT*****
 
-
-// parameter   (not implementing?)
+//others 
 #define MAX_ON_MAIN 100  // % limit max ontime of element 0-100 // parameter28
 #define MAX_HEATER_ON 24  //^^ parameter number
-
 #define TEMPERATURE_COOL_MIN 100  //min temp to complete cool
 #define COOL_TEMP 25            //^^ parameter number
+
 // ****** serial speed ********
 #define SERIAL_SPEED 115200  //serial com speed parameter 36
 #define SERIAL_BAUD 26        //^^ parameter number
+//********** end paramters saved in eeprom *****************
+
 
 //Pin assignments
-// ******* rotary encoder setup *****************
-#define ROTARY_PIN1 10  //D16 PC0 PCINIT16 SCA
-#define ROTARY_PIN2 11  //D17 PC1 PCINIT17 SCL
-#define BUTTON_PIN A1   //D25 PA1 PCINIT1 ADC1
 
+#define ROTARY_PIN1 10  //D16 PC0 PCINIT16 SCA encoder
+#define ROTARY_PIN2 11  //D17 PC1 PCINIT17 SCL encoder 
+#define BUTTON_PIN A1   //D25 PA1 PCINIT1 ADC1 encoder button 
 #define SSR_MAIN 12   //SSR PIN
 #define LED_PIN 0     //led pin
 #define BUZZER_PIN 5  //buzzer pin
@@ -271,7 +264,7 @@ const char* lcdMessagesReflowStatus[] = {  //text for display
 
 //this will load the defaults parameters.. menu will use to load to defaults
 
-double defaultpx[41] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
+double defaultpx[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                          LF_SOAK_TIME, LF_SOAK_RAMP_TEMP, LF_REFLOW_TEMP_HOLFOFF, LF__REFLOW_TEMP,
                          LF_REFLOW_TIME, PB_SOAK_TEMP_HOLDOFF, PB_SOAK_TEMP, PB_SOAK_TIME,
                          PB_SOAK_RAMP_TEMP, PB_REFLOW_TEMO_HOLDOFF, PB_REFLOW_TEMP, PB_REFLOW_TIME,
@@ -320,17 +313,18 @@ EncoderButton eb1(ROTARY_PIN1, ROTARY_PIN2, BUTTON_PIN);  //sets up the encoder 
 Servo doorServo;  // create servo object to control a servo
 
 void setup() {
-  for (int i = 0; i < 26; i++) {  //this loop loads eeprom into parameters
+  for (int i = 0; i < 27; i++) {  //this loop loads eeprom into parameters
 
     //EEPROM.put(EEPROM_STORAGE_ADDRESS + (i*4) , px[i]);   //this loads eeprom from parameters
     // EEPROM.get(EEPROM_STORAGE_ADDRESS + (i * 4), px[i]);  //this loads parameters from eeprom
   }
-  for (int i = 26; i <= 30; i++) {  //clear the commands parameters
+  for (int i = 27; i < 30; i++) {  //clear the commands parameters
     px[i] = 0;
   }
   
 
-  Serial.begin(SERIAL_SPEED); //Serial.begin(px[SERIAL_BAUD]); //something strange 
+  //Serial.begin(SERIAL_SPEED); //trash 
+  Serial.begin(px[SERIAL_BAUD]); //set serial speed 
   // Check current selected reflow profile
   unsigned char value;  // = EEPROM.read(PROFILE_TYPE_ADDRESS);
   EEPROM.get(PROFILE_TYPE_ADDRESS, value);
@@ -551,7 +545,7 @@ void loop() {
       oled.setCursor(0, 18);
       oled.print(parameterNames[programPointer]);  //really bad name? lol
       oled.setCursor(30, 36);
-      if (programPointer < 30 || programPointer == 36) {
+      if (programPointer < 26 || programPointer == 26) {
         while (shiftPlaces-- > 0)           //loop the number of time
           oled.print(F(" "));               //spaces for deciaml alignemnt
         oled.print(px[programPointer], 4);  //menuPointer programPointer edit
@@ -812,7 +806,7 @@ void loop() {
             programPointer = 0;       //if so jump to bottom
           }
         }
-        if (lastPointer != programPointer && programPointer > 25 && programPointer != 26) {
+        if (lastPointer != programPointer && programPointer > 26 && programPointer != 26) {
           menuSpecial = 1;
           if (px[programPointer] == 0) {
             menuYes = 0;
@@ -850,7 +844,7 @@ void loop() {
           }
         }
 
-        if (programPointer < 30 && edit && menuPointer != 10) {  //Is pointer inside the parameter value?
+        if (programPointer < 26 && edit && menuPointer != 10) {  //Is pointer inside the parameter value?
                                                                  //  double enc = encoder;
           menuSpecial = 0;                                       //not in special functions mode
           double Z = 0;
@@ -871,107 +865,11 @@ void loop() {
           if (px[programPointer] < 0) {         //catch negative parameter value
             px[programPointer] = 0;             //if so zero it out
           }
-        } else if (programPointer > 29 && edit && menuPointer != 10) {  //are we in the
+        } else if (programPointer > 26 && edit && menuPointer != 10) {  //are we in the
           menuSpecial = 1;                           // special section of the menu?
           switch (programPointer) {                  //figure out where we are and act accordanly
-            case 30:                                 //boost on pre
-              if (encoder != 0) {
-                if (menuYes == 1) {
-                  menuYes = 0;
-                } else {
-                  menuYes = 1;
-                }
-              }
-              if (button) {
-                px[programPointer] = menuYes;
-                button = 0;
-                menuPointer = 10;  // move selector back to px
-                edit = 1;          // sw back to edit mode
-              };
-              break;
-
-            case 31:  //main on pre
-              if (encoder != 0) {
-                if (menuYes == 1) {
-                  menuYes = 0;
-                } else {
-                  menuYes = 1;
-                }
-              }
-              if (button) {
-                px[programPointer] = menuYes;
-                button = 0;
-                menuPointer = 10;  // move selector back to parameters
-                edit = 1;          // sw back to edit mode
-              };
-              break;
-
-            case 32:  //boost on soak
-              if (encoder != 0) {
-                if (menuYes == 1) {
-                  menuYes = 0;
-                } else {
-                  menuYes = 1;
-                }
-              }
-              if (button) {
-                px[programPointer] = menuYes;
-                button = 0;
-                menuPointer = 10;  // move selector back to parameters
-                edit = 1;          // sw back to edit mode
-              };
-              break;
-
-            case 33:  //main on soak
-              if (encoder != 0) {
-                if (menuYes == 1) {
-                  menuYes = 0;
-                } else {
-                  menuYes = 1;
-                }
-              }
-              if (button) {
-                px[programPointer] = menuYes;
-                button = 0;
-                menuPointer = 10;  // move selector back to parameters
-                edit = 1;          // sw back to edit mode
-              };
-              break;
-
-            case 34:  //boost on reflow
-              if (encoder != 0) {
-                if (menuYes == 1) {
-                  menuYes = 0;
-                } else {
-                  menuYes = 1;
-                }
-              }
-              if (button) {
-                px[programPointer] = menuYes;
-                button = 0;
-                menuPointer = 10;  // move selector back to parameters
-                edit = 1;          // sw back to edit mode
-              };
-              break;
-
-            case 35:  //main on reflow
-              if (encoder != 0) {
-                if (menuYes == 1) {
-                  menuYes = 0;
-                } else {
-                  menuYes = 1;
-                }
-              }
-              if (button) {
-                px[programPointer] = menuYes;
-                button = 0;
-                menuPointer = 10;  // move selector back to parameters
-                edit = 1;          // sw back to edit mode
-              };
-              break;
-
-
-            case 36:                          //serial speed toggle through real values
+            
+            case 26:                          //serial speed toggle through real values
               currentBaudPointer -= encoder;  //move pointer by encoder counts
               if (currentBaudPointer > 13) {  //  handle rollover
                 currentBaudPointer = 0;
@@ -983,10 +881,11 @@ void loop() {
                 button = 0;
                 menuPointer = 10;  // move selector back to parameters
                 edit = 1;          // sw back to edit mode
+                Serial.begin(px[SERIAL_BAUD]);
               };
               break;
 
-            case 37:  //exit menu
+            case 27:  //exit menu
               if (encoder != 0) {
                 if (menuYes == 1) {
                   menuYes = 0;
@@ -1002,7 +901,7 @@ void loop() {
               };
               break;
 
-            case 38:  //dump to serial
+            case 28:  //dump to serial
               if (encoder != 0) {
                 if (menuYes == 1) {
                   menuYes = 0;
@@ -1018,7 +917,7 @@ void loop() {
               };
               break;
 
-            case 39:  //load default parameters
+            case 29:  //load default parameters
               if (encoder != 0) {
                 if (menuYes == 1) {
                   menuYes = 0;
@@ -1034,7 +933,7 @@ void loop() {
               };
               break;
 
-            case 40:  //save to eeprom
+            case 30:  //save to eeprom
               if (encoder != 0) {
                 if (menuYes == 1) {
                   menuYes = 0;
@@ -1062,8 +961,8 @@ void loop() {
         encoder = 0;  //clear encoder count
 
 
-        if (px[37] != 0) {  //exit edit mode
-          px[37] = 0;
+        if (px[27] != 0) {  //exit edit mode
+          px[27] = 0;
           reflowState = IDLE;  //reset to idle
           reflowStatus = OFF;
           menuPointer = 10;  // move selector back to parameters
@@ -1071,9 +970,9 @@ void loop() {
           lastPointer = 55;  //set to out of range to trip rereading for YES/NO
         }
 
-        if (px[38] != 0) {
+        if (px[28] != 0) {
           double x;  //this dumps eemprom to serial port
-          for (int i = 0; i <= 36; i++) {
+          for (int i = 0; i <= 30; i++) {
             Serial.print("Parameter[ ");
             Serial.print(i);
             Serial.print("] Name is ");
@@ -1084,23 +983,23 @@ void loop() {
             EEPROM.get(EEPROM_STORAGE_ADDRESS + (i * 4), x);
             Serial.println(x, 3);  //was truncating .025 to .03 fix
           }
-          px[38] = 0;
+          px[28] = 0;
           lastPointer = 55;  //set to out of range to trip rereading for YES/NO
         }
 
-        if (px[39] != 0) {                //load default parameters
-          for (int i = 0; i < 41; i++) {  //clear the commands parameters
+        if (px[29] != 0) {                //load default parameters
+          for (int i = 0; i < 27; i++) {  //clear the commands parameters
             px[i] = defaultpx[i];
           }
           //lastPointer = 55;  //set to out of range to trip rereading for YES/NO
         }
 
-        if (px[40] != 0) {                                        //write parameters to eeprom
-          for (int i = 0; i <= 37; i++) {                         //this loop loads eeprom
+        if (px[30] != 0) {                                        //write parameters to eeprom
+          for (int i = 0; i < 31; i++) {                         //this loop loads eeprom
             EEPROM.put(EEPROM_STORAGE_ADDRESS + (i * 4), px[i]);  //this loads eeprom from parameters
             //  EEPROM.get(EEPROM_STORAGE_ADDRESS + (i * 4), parameters[i]);  //this loads parameters from eeprom
           }
-          px[40] = 0;
+          px[30] = 0;
           lastPointer = 55;  //set to out of range to trip rereading for YES/NO
         }
 
