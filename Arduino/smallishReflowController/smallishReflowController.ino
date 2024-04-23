@@ -1,46 +1,24 @@
-#define version 34
+#define version 35
 
 /*Title: Smallish Reflow Controller
   Date: 03-31-2024
   Author: Cory Lytle  KO4SWI
 
-  This code was taken from Tiny Reflow Controller and adapted and modified.
-  All Tiny V1 code was deleted for clairity, I was overwhelemed enough.   
+  This code was taken from Tiny Reflow Controller and adapted and modified, only 
+  some parts of the structure remain, and its exellent display code.
   Thermocouple controller was changed to a MAX6657 and buttons were 
-  replaced with a encoder buttons with plans to be able to change values thru 
-  the user interface.  It's also been adapted to have 2 heating controls, boost and main.
+  replaced with a encoder button to enable settings configuration at the panel.
   The origonal code wouldn't run from on a 328P due to, I believe, running out of memory.  
-  So it was moved to a ATmega644 processor.   
+  So it was moved to a ATmega644 processor on a MightyCore board for development. 
+  So the MightyCore board needs loaded to build with the Arduino IDE.
+  A servo to open the door is being added.    
 
-  smallish-reflow-controller 6 switch to parameter useage to begin menu addition, load parameter from eeprom, select program mode and dump parameters to serial.    
-  smallish-reflow-controller 7 Added some menu and edit functions.  encoder passed to program section, button is working but sluggish...not using interupt???? how to know?
-  smallish-reflow-controller 8 hacked menu functions into existing display routine, formatting hell, started to implment variable manulapation    
-  smallish-reflow-controller 9 menu formatted, cursor handled, so many little tweeks... save point   
-  smallish-reflow-controller 10 editing values, with bugs.   dump to serial working 
-  smallish-reflow-controller 11 again reworked all the parameters numbers and corrected menu nonsense
-  smallish-reflow-controller 12  fixed the horriable bug incrementing parameter values. made mess out of menus 
-  smallish-reflow-controller 13 most menus working, including setting baud rates that I'm not ashamed of
-  smallish-reflow-controller 14 yes no menus working except for write/read eeprom and defaults
-  
-  smallish-reflow-controller 15 all menus are working, but bugs, jumping to next due to near disaster
-  smallish-reflow-controller 16 actaully working, boost element disabled.  I couple bug fixes.  Added ramp to preheat 
-  smallish-reflow-controller 17 making changes to start stop points for overshoot and switching to time based cycles
-  smallish-reflow-controller 19  working on ramping and avoiding overshoot.  
-  smallish-reflow-controller 20 mostly working, adding switch cases for mode in 21
-  smallish-reflow-controller 21 have reflow working in modes.  
-  smallish-reflow-controller 22 smoothed temp sensor, increased sampling. renamed stuff
-  smallish-reflow-controller 23 changed over soak to new functions
-  smallish-reflow-controller 24 had a big disaster, saving. Moved timer outside of switch statment
-  smallish-reflow-controller 26 changed preheat over to new function methoid, removed button complication
-  smallish-reflow-controller 27 watchdog added, door servo added. Refactoring variables:partly  
-  smallish-reflow-controller 28 more variable changes and refactoring, next changes will break
-                    //the program so saving here.
-  smallish-reflow-controller 29  seems to work with variables changed. menus and hardcoded stuff need fixed
 
   V31 organizing and commenting    
   V32 fixing menus, some bugs(known) remain        
   V33 fixed menus minor tweeks and the modes only moving 1 way with encoder        
   V34 clean, fix menus still, removed dead code,  
+  V35 deleting extra junk, a few misc bugs
   */
 
 
@@ -134,7 +112,7 @@
 #define PID_D_SOAK 20          //^^ parameter number
 
 // ***** REFLOW STAGE *****
-#define PID_KP_REFLOW_MAIN 150    // parameter22
+#define PID_KP_REFLOW_MAIN 200    // parameter22
 #define PID_P_REFLOW 21           //^^ parameter number
 #define PID_KI_REFLOW_MAIN 0.025  //parameter23
 #define PID_I_REFLOW 22           //^^ parameter number
@@ -292,11 +270,11 @@ const double baudRates[14] = { 2400, 4800, 9600, 14400, 19200, 28800, 38400, 576
                                74800, 115200, 230400, 250000, 500000, 1000000 };
 
 // these are the texts for the menu.
-const char parameterNames[][22] = { "TEMPERATURE_ROOM", "LF_SOAK_TEMP_HOLDOFF",
+const char parameterNames[][24] = { "TEMPERATURE_ROOM", "LF_SOAK_TEMP_HOLDOFF",
                                     "LF_SOAK_TEMP", "LF_SOAK_TIME", "LF_SOAK_RAMP_TEMP",
-                                    "LF_REFLOW_TEMP_HOLFOFF", "LF__REFLOW_TEMP", "LF_REFLOW TIME",
+                                    "LF_REFLOW_TEMP_HOLFOF", "LF__REFLOW_TEMP", "LF_REFLOW TIME",
                                     "PB_SOAK_TEMP_HOLDOFF", "PB_SOAK_TEMP", "PB_SOAK_TIME", "PB_SOAK_RAMP_TEMP",
-                                    "PB_REFLOW_TEMO_HOLDOFF", "PB_REFLOW_TEMP", "PB_REFLOW_TIME", "PID_KP_PREHEAT_MAIN",
+                                    "PB_REFLOW_TEMP_HOLDOF", "PB_REFLOW_TEMP", "PB_REFLOW_TIME", "PID_KP_PREHEAT_MAIN",
                                     "PID_KI_PREHEAT_MAIN", "PID_KD_PREHEAT_MAIN", "PID_KP_SOAK_MAIN", "PID_KI_SOAK_MAIN",
                                     "PID_KD_SOAK_MAIN", "PID_KP_REFLOW_MAIN", "PID_KI_REFLOW_MAIN", "PID_KD_REFLOW_MAIN",
                                     "MAX_ON_MAIN", "TEMPERATURE_COOL_MIN", "SERIAL_SPEED", "EXIT", "DUMP_TO_SERIAL",
@@ -603,6 +581,7 @@ void loop() {
           reflowState = TOO_HOT;
           break;
         }
+        doorServo.write(0);          //zero out door servo
         // If switch is pressed to start reflow process
         if (button && (reflowProfile != PROGRAM_MODE)) {
           // Send header for CSV file
