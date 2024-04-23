@@ -1,4 +1,4 @@
-#define version 33
+#define version 34
 
 /*Title: Smallish Reflow Controller
   Date: 03-31-2024
@@ -39,12 +39,13 @@
 
   V31 organizing and commenting    
   V32 fixing menus, some bugs(known) remain        
-  V33 fixed menus minor tweeks, and the modes only moving 1 way with encoder        
+  V33 fixed menus minor tweeks and the modes only moving 1 way with encoder        
+  V34 clean, fix menus still, removed dead code,  
   */
 
 
 //*****************************************************
-//********* how are we going to watchdog this?  *******
+//********* watchdog is running  *******
 //********* charge pump the SSR supply? ***************
 //*****************************************************
 
@@ -246,7 +247,7 @@ bool edit = 1;           // sw back to edit mode
 bool menuSpecial = 0;    // menus that behave diffrently get this
 int menuYes = 0;         // IDK, look into this
 const char menuOptions[][4] = { "NO", "YES" };
-//double px[31];
+double px[31];
 
 
 
@@ -274,7 +275,7 @@ double defaultpx[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                          PID_KD_REFLOW_MAIN, MAX_ON_MAIN, TEMPERATURE_COOL_MIN, SERIAL_SPEED };
 
 //delete this next part when eeprom is running again.
-double px[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
+/*double px[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                   LF_SOAK_TIME, LF_SOAK_RAMP_TEMP, LF_REFLOW_TEMP_HOLFOFF, LF__REFLOW_TEMP,
                   LF_REFLOW_TIME, PB_SOAK_TEMP_HOLDOFF, PB_SOAK_TEMP, PB_SOAK_TIME,
                   PB_SOAK_RAMP_TEMP, PB_REFLOW_TEMO_HOLDOFF, PB_REFLOW_TEMP, PB_REFLOW_TIME,
@@ -283,11 +284,12 @@ double px[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                   PID_KD_REFLOW_MAIN, MAX_ON_MAIN, TEMPERATURE_COOL_MIN, SERIAL_SPEED };
 
 
+*/
 int currentBaudPointer = 0;  // pointer for selecting baudrates from list, should be local?
 
 //availble baud rates, did I miss anything important?
 const double baudRates[14] = { 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600,
-                               76800, 115200, 230400, 250000, 500000, 1000000 };
+                               74800, 115200, 230400, 250000, 500000, 1000000 };
 
 // these are the texts for the menu.
 const char parameterNames[][22] = { "TEMPERATURE_ROOM", "LF_SOAK_TEMP_HOLDOFF",
@@ -317,7 +319,7 @@ void setup() {
   for (int i = 0; i < 27; i++) {  //this loop loads eeprom into parameters
 
     //EEPROM.put(EEPROM_STORAGE_ADDRESS + (i*4) , px[i]);   //this loads eeprom from parameters
-    // EEPROM.get(EEPROM_STORAGE_ADDRESS + (i * 4), px[i]);  //this loads parameters from eeprom
+    EEPROM.get(EEPROM_STORAGE_ADDRESS + (i * 4), px[i]);  //this loads parameters from eeprom
   }
   for (int i = 27; i < 30; i++) {  //clear the commands parameters
     px[i] = 0;
@@ -618,9 +620,9 @@ void loop() {
 
           // Initialize PID control window starting time
           windowStartTime = millis();
-          
-          unsigned char value = reflowProfile;  // save used profile to eeprom
-          EEPROM.put(PROFILE_TYPE_ADDRESS, value );  //upon cycle start  
+
+          unsigned char value = reflowProfile;      // save used profile to eeprom
+          EEPROM.put(PROFILE_TYPE_ADDRESS, value);  //upon cycle start
 
           // Load profile specific constant
           if (reflowProfile == REFLOW_PROFILE_LEADFREE) {
@@ -799,7 +801,7 @@ void loop() {
           break;
       //**********************Programming mode handeling
       case PROGRAM:
-        //systemTimer = millis() + 250; //speed up loop if in menu responce
+        systemTimer = millis() + 250;     //speed up loop if in menu responce
         if (edit && menuPointer == 10) {  //are we selecting the parameters
           programPointer += encoder;      //change pointer of parameter by encoder counts
           if (programPointer < 0) {       //did we hit bottom of list?
@@ -971,6 +973,7 @@ void loop() {
           menuPointer = 10;  // move selector back to parameters
           edit = 0;
           lastPointer = 55;  //set to out of range to trip rereading for YES/NO
+          px[27] = 0;
         }
 
         if (px[28] != 0) {
@@ -994,13 +997,17 @@ void loop() {
           for (int i = 0; i < 27; i++) {  //clear the commands parameters
             px[i] = defaultpx[i];
           }
-          //lastPointer = 55;  //set to out of range to trip rereading for YES/NO
+          Serial.begin(px[SERIAL_BAUD]);
+          px[29] = 0;
         }
 
-        if (px[30] != 0) {                                        //write parameters to eeprom
-          for (int i = 0; i < 31; i++) {                          //this loop loads eeprom
-            EEPROM.put(EEPROM_STORAGE_ADDRESS + (i * 4), px[i]);  //this loads eeprom from parameters
-            //  EEPROM.get(EEPROM_STORAGE_ADDRESS + (i * 4), parameters[i]);  //this loads parameters from eeprom
+        if (px[30] != 0) {                //write parameters to eeprom
+          for (int i = 0; i <= 30; i++) {  //this loop loads eeprom
+            if (i < 27) {
+              EEPROM.put(EEPROM_STORAGE_ADDRESS + (i * 4), px[i]);  //this loads eeprom from parameters
+            } else {
+              EEPROM.put(EEPROM_STORAGE_ADDRESS + (i * 4), 0);  //clear V25 junk
+            }
           }
           px[30] = 0;
           lastPointer = 55;  //set to out of range to trip rereading for YES/NO
@@ -1055,64 +1062,19 @@ void onEb1Clicked(EncoderButton& eb) {
 void onEb1Encoder(EncoderButton& eb) {
   // Only can switch reflow profile during idle
   encoder += eb.increment();
-  if (reflowState == IDLE) {
-    int profile = 10 + reflowProfile + encoder;
-      if(profile > 12){
-        profile -= 3;
-      }
-      if (profile < 10 ){
-        profile += 3;
-      }
-      reflowProfile = profile -10;
-      encoder =0;  
-  }
-}
-
-/*   delete if the above doesn't cause issues 
-
-    switch (reflowProfile) {
-      case REFLOW_PROFILE_LEADFREE:
-        reflowProfile = REFLOW_PROFILE_LEADED;
-        //EEPROM.put(PROFILE_TYPE_ADDRESS, 1);
-        break;
-
-      case REFLOW_PROFILE_LEADED:
-        reflowProfile = PROGRAM_MODE;
-        break;
-
-      case PROGRAM_MODE:
-        reflowProfile = REFLOW_PROFILE_LEADFREE;
-        //EEPROM.put(PROFILE_TYPE_ADDRESS, 0);
-        break;
+  if (reflowState == IDLE) {     // only if in idle
+    int profile = 10 + reflowProfile + encoder;  //add 10 to remove possable neg #
+    if (profile > 12) {     //roll over
+      profile -= 3;
     }
-  }
-}
-
-
-
-
-/*void onEb1Encoder(EncoderButton& eb) {
-  // Only can switch reflow profile during idle
-  encoder += eb.increment();
-  if (reflowState == IDLE) {
-    switch (reflowProfile) {
-      case REFLOW_PROFILE_LEADFREE:
-        reflowProfile = REFLOW_PROFILE_LEADED;
-        EEPROM.put(PROFILE_TYPE_ADDRESS, 1);
-        break;
-
-      case REFLOW_PROFILE_LEADED:
-        reflowProfile = PROGRAM_MODE;
-        break;
-
-      case PROGRAM_MODE:
-        reflowProfile = REFLOW_PROFILE_LEADFREE;
-        EEPROM.put(PROFILE_TYPE_ADDRESS, 0);
-        break;
+    if (profile < 10) {     //roll under
+      profile += 3;
     }
+    reflowProfile = profile - 10;   //set profile, less the 10
+    encoder = 0;    //clear encoder valus to fix menu jumping when entering prog mode 
   }
 }
-*/
+
 
 /*********MOST OF THE ORIGONAL TINY REFLOW OVEN HEADER** THANKS TO THE TRUE PROGRAMMERS ** MY APPOLIGIES FOR MY MINIMIAL SKILLS******************
   Title: Tiny Reflow Controller
