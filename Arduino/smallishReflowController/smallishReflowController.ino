@@ -11,7 +11,8 @@
   The origonal code wouldn't run from on a 328P due to, I believe, running out of memory.  
   So it was moved to a ATmega644 processor on a MightyCore board for development. 
   So the MightyCore board needs loaded to build with the Arduino IDE.
-  A servo to open the door is being added.    
+  A servo to open the door is being added.   
+  https://github.com/clytle374/Smallish-Reflow-Controller
 
 
   V31 organizing and commenting    
@@ -132,7 +133,6 @@
 
 
 //Pin assignments
-
 #define ROTARY_PIN1 10    //D16 PC0 PCINIT16 SCA encoder
 #define ROTARY_PIN2 11    //D17 PC1 PCINIT17 SCL encoder
 #define BUTTON_PIN A1     //D25 PA1 PCINIT1 ADC1 encoder button
@@ -171,7 +171,7 @@ typedef enum REFLOW_STATUS {  //reflow yes or no, why not bool?
 } reflowStatus_t;
 
 
-typedef enum REFLOW_PROFILE {  //switch for ROHS, lean, Program mode
+typedef enum REFLOW_PROFILE {  //switch for ROHS, lead, Program mode
   REFLOW_PROFILE_LEADFREE,
   REFLOW_PROFILE_LEADED,
   PROGRAM_MODE
@@ -179,7 +179,7 @@ typedef enum REFLOW_PROFILE {  //switch for ROHS, lean, Program mode
 
 
 // ***** PID CONTROL VARIABLES *****
-double setpoint;
+double setpoint;     //target temp
 double input = 21;  //zero will throw errors before first averaged sample
 double outputMain;  //output from PID for main element
 
@@ -190,7 +190,6 @@ unsigned long nextCheck;    // time keeping variable
 unsigned long nextRead;     //next read of thermouple
 unsigned long updateLcd;    //display update interval
 unsigned long systemTimer;  //timer for running everything in run modes
-bool rampRunning = 0;       // heating element is catching up, start ramp
 unsigned long lastTemp;     //chatch if temp isn't coasting up
 unsigned long soakTimer;    //timer for soaking
 unsigned long reflowTimer;  //timer for relow
@@ -212,7 +211,7 @@ reflowProfile_t reflowProfile;      // Reflow profile type
 currentFunction_t currentFunction;  //functions inside each state
 
 unsigned int timerSeconds;  // Seconds timer for serial data out, or more?
-unsigned int fault;         // Thermocouple fault status variable DOESN"T WORK
+unsigned int fault;         // Thermocouple fault status variable DOESN'T WORK
 unsigned int timerUpdate;
 unsigned char temperature[SCREEN_WIDTH - X_AXIS_START];
 unsigned char x;
@@ -224,8 +223,8 @@ int menuPointer = 10;    // move selector back to parameters
 bool edit = 1;           // sw back to edit mode
 bool menuSpecial = 0;    // menus that behave diffrently get this
 int menuYes = 0;         // IDK, look into this
-const char menuOptions[][4] = { "NO", "YES" };
-double px[31];
+int currentBaudPointer = 0;  // pointer for selecting baudrates from list, should be local?
+double px[31];          //parameters 
 
 
 
@@ -242,6 +241,19 @@ const char* lcdMessagesReflowStatus[] = {  //text for display
   "Program"
 };
 
+// these are the texts for the menu.
+const char menuOptions[][4] = { "NO", "YES" };  //display for ON/OFF menu options
+const char parameterNames[][24] = { "TEMPERATURE_ROOM", "LF_SOAK_TEMP_HOLDOFF",
+                                    "LF_SOAK_TEMP", "LF_SOAK_TIME", "LF_SOAK_RAMP_TEMP",
+                                    "LF_REFLOW_TEMP_HOLFOF", "LF__REFLOW_TEMP", "LF_REFLOW TIME",
+                                    "PB_SOAK_TEMP_HOLDOFF", "PB_SOAK_TEMP", "PB_SOAK_TIME", "PB_SOAK_RAMP_TEMP",
+                                    "PB_REFLOW_TEMP_HOLDOF", "PB_REFLOW_TEMP", "PB_REFLOW_TIME", "PID_KP_PREHEAT_MAIN",
+                                    "PID_KI_PREHEAT_MAIN", "PID_KD_PREHEAT_MAIN", "PID_KP_SOAK_MAIN", "PID_KI_SOAK_MAIN",
+                                    "PID_KD_SOAK_MAIN", "PID_KP_REFLOW_MAIN", "PID_KI_REFLOW_MAIN", "PID_KD_REFLOW_MAIN",
+                                    "MAX_ON_MAIN", "TEMPERATURE_COOL_MIN", "SERIAL_SPEED", "EXIT", "DUMP_TO_SERIAL",
+                                    "LOAD_DEFAULT_SETTINGS", "SAVE_TO_EEPROM" };
+
+
 //this will load the defaults parameters.. menu will use to load to defaults
 
 double defaultpx[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
@@ -252,7 +264,9 @@ double defaultpx[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                          PID_KI_SOAK_MAIN, PID_KD_SOAK_MAIN, PID_KP_REFLOW_MAIN, PID_KI_REFLOW_MAIN,
                          PID_KD_REFLOW_MAIN, MAX_ON_MAIN, TEMPERATURE_COOL_MIN, SERIAL_SPEED };
 
-//delete this next part when eeprom is running again.
+
+
+//uncomment this when skipping loading the eeprom 
 /*double px[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                   LF_SOAK_TIME, LF_SOAK_RAMP_TEMP, LF_REFLOW_TEMP_HOLFOFF, LF__REFLOW_TEMP,
                   LF_REFLOW_TIME, PB_SOAK_TEMP_HOLDOFF, PB_SOAK_TEMP, PB_SOAK_TIME,
@@ -263,22 +277,11 @@ double defaultpx[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
 
 
 */
-int currentBaudPointer = 0;  // pointer for selecting baudrates from list, should be local?
 
 //availble baud rates, did I miss anything important?
 const double baudRates[14] = { 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600,
                                74800, 115200, 230400, 250000, 500000, 1000000 };
 
-// these are the texts for the menu.
-const char parameterNames[][24] = { "TEMPERATURE_ROOM", "LF_SOAK_TEMP_HOLDOFF",
-                                    "LF_SOAK_TEMP", "LF_SOAK_TIME", "LF_SOAK_RAMP_TEMP",
-                                    "LF_REFLOW_TEMP_HOLFOF", "LF__REFLOW_TEMP", "LF_REFLOW TIME",
-                                    "PB_SOAK_TEMP_HOLDOFF", "PB_SOAK_TEMP", "PB_SOAK_TIME", "PB_SOAK_RAMP_TEMP",
-                                    "PB_REFLOW_TEMP_HOLDOF", "PB_REFLOW_TEMP", "PB_REFLOW_TIME", "PID_KP_PREHEAT_MAIN",
-                                    "PID_KI_PREHEAT_MAIN", "PID_KD_PREHEAT_MAIN", "PID_KP_SOAK_MAIN", "PID_KI_SOAK_MAIN",
-                                    "PID_KD_SOAK_MAIN", "PID_KP_REFLOW_MAIN", "PID_KI_REFLOW_MAIN", "PID_KD_REFLOW_MAIN",
-                                    "MAX_ON_MAIN", "TEMPERATURE_COOL_MIN", "SERIAL_SPEED", "EXIT", "DUMP_TO_SERIAL",
-                                    "LOAD_DEFAULT_SETTINGS", "SAVE_TO_EEPROM" };
 
 // PID control initalize // PID values are garbage now since I can not load eeprom yet
 PID reflowOvenPIDmain(&input, &outputMain, &setpoint, 100, .025, 20, DIRECT);
@@ -581,7 +584,7 @@ void loop() {
           reflowState = TOO_HOT;
           break;
         }
-        doorServo.write(0);          //zero out door servo
+        doorServo.write(0);          //servo  to door close 
         // If switch is pressed to start reflow process
         if (button && (reflowProfile != PROGRAM_MODE)) {
           // Send header for CSV file
@@ -589,7 +592,6 @@ void loop() {
           // Intialize seconds timer for serial debug information
           timerSeconds = 0;  //starting reflow cycle time?
           timerUpdate = 0;
-          rampRunning = 0;
           for (x = 0; x < (SCREEN_WIDTH - X_AXIS_START); x++) {
             temperature[x] = 0;
           }
@@ -657,7 +659,7 @@ void loop() {
 
           case RAMP:
             setpoint += 2;
-            if (input >= soakTemp - 25) {
+            if (input >= soakTemp - soakTempHoldoff) {
               reflowOvenPIDmain.SetTunings(px[PID_P_SOAK], px[PID_I_SOAK], px[PID_D_SOAK]);
               reflowState = SOAK;
               currentFunction = COAST;
@@ -684,9 +686,9 @@ void loop() {
             break;
 
           case MAINTAIN:
-            if (millis() > soakTimer + 60000) {
+            if (millis() > soakTimer + soakTime) {
               reflowOvenPIDmain.SetTunings(px[PID_P_REFLOW], px[PID_I_REFLOW], px[PID_D_REFLOW]);
-              setpoint = input + 25;
+              setpoint = input + 20;
               reflowState = REFLOW;
               currentFunction = INTERCEPT;
               break;
@@ -712,7 +714,7 @@ void loop() {
 
           case RAMP:
             setpoint += 2;
-            if (input >= reflowTemp - 15) {
+            if (input >= reflowTemp - reflowTempHoldoff) {
               currentFunction = COAST;
               setpoint = input;
             }
@@ -728,7 +730,7 @@ void loop() {
             break;
 
           case MAINTAIN:
-            if (millis() > reflowTimer + 60000) {
+            if (millis() > reflowTimer + reflowTime) {
               setpoint = px[COOL_TEMP];
               reflowState = COOL;
               break;
