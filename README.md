@@ -44,4 +44,4 @@ The oven is based on a $20 toaster oven from Walmart, 2 of them actually as the 
 ![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/91d92f42080de914bb2c817a75af77370e52f0ce/images/PXL_20240418_001903719.jpg?raw=true "Chamber Installed")
 ![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/91d92f42080de914bb2c817a75af77370e52f0ce/images/PXL_20240224_103518909.MP.jpg?raw=true "Making the chamber")
 ![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/91d92f42080de914bb2c817a75af77370e52f0ce/images/PXL_20240416_003407255.jpg?raw=true "Staybolts")
-
+![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/40be4b0a984caed33c0f9d8965e814f7ed2b25fe/images/PXL_20240416_003355388.jpg?raw=true "Cut down elements")
