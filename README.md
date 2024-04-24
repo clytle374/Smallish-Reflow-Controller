@@ -41,4 +41,7 @@ Initially the setpoint is set above current temperature.  The program waits for 
 
 The oven is based on a $20 toaster oven from Walmart, 2 of them actually as the whole oven is cheaper than one heating element. Each oven has a 470 watt and 580 watt quartz elements.  The oven was fitted with an insert made from the second oven and aluminum flashing as the top half of the chamber for less heat mass. It was insulated with Kaowool, and cheap aluminum coated fiberglass adhesive on the inside. The quarts tubes were cut shorter with a diamond wheel in a dreamil tool and all 4 were put in the bottom, giving about 2KW.  In hindsight I would have tried using aluminum flashing with koawool across the bottom/back/top before I cut the elements. 4 holes were drilled though the oven sides and into the chamber.  Sheetmetal screws were then used as staybolts to hold it in place.
 
-More pictures of oven.
+![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/91d92f42080de914bb2c817a75af77370e52f0ce/images/PXL_20240418_001903719.jpg?raw=true "Chamber Installed")
+![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/91d92f42080de914bb2c817a75af77370e52f0ce/images/PXL_20240224_103518909.MP.jpg?raw=true "Making the chamber")
+![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/91d92f42080de914bb2c817a75af77370e52f0ce/images/PXL_20240416_003407255.jpg?raw=true "Staybolts")
+
