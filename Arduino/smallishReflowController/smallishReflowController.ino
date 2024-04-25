@@ -20,6 +20,7 @@
   V33 fixed menus minor tweeks and the modes only moving 1 way with encoder        
   V34 clean, fix menus still, removed dead code,  
   V35 deleting extra junk, a few misc bugs
+  V36 more cleanup, removed hardcoded values, work on soak ramp option
   */
 
 
@@ -138,7 +139,7 @@
 #define BUTTON_PIN A1     //D25 PA1 PCINIT1 ADC1 encoder button
 #define SSR_MAIN 12       //SSR PIN
 #define LED_PIN 0         //led pin
-#define BUZZER_PIN 5      //buzzer pin
+#define BUZZER_PIN 13     //buzzer pin
 #define SERVOPIN A0       //servo PWM
 #define MAX6675_CS_PIN 1  //chip select max6675 thermocouple
 
@@ -179,7 +180,7 @@ typedef enum REFLOW_PROFILE {  //switch for ROHS, lead, Program mode
 
 
 // ***** PID CONTROL VARIABLES *****
-double setpoint;     //target temp
+double setpoint;    //target temp
 double input = 21;  //zero will throw errors before first averaged sample
 double outputMain;  //output from PID for main element
 
@@ -215,16 +216,16 @@ unsigned int fault;         // Thermocouple fault status variable DOESN'T WORK
 unsigned int timerUpdate;
 unsigned char temperature[SCREEN_WIDTH - X_AXIS_START];
 unsigned char x;
-int encoder;             //stored encoder couunts
-bool button = 0;         // is button pressed?
-int programPointer = 0;  //what is the current position of the programming menu
-int lastPointer;         //save state to catch change
-int menuPointer = 10;    // move selector back to parameters
-bool edit = 1;           // sw back to edit mode
-bool menuSpecial = 0;    // menus that behave diffrently get this
-int menuYes = 0;         // IDK, look into this
+int encoder;                 //stored encoder couunts
+bool button = 0;             // is button pressed?
+int programPointer = 0;      //what is the current position of the programming menu
+int lastPointer;             //save state to catch change
+int menuPointer = 10;        // move selector back to parameters
+bool edit = 1;               // sw back to edit mode
+bool menuSpecial = 0;        // menus that behave diffrently get this
+int menuYes = 0;             // IDK, look into this
 int currentBaudPointer = 0;  // pointer for selecting baudrates from list, should be local?
-double px[31];          //parameters 
+double px[31];               //parameters
 
 
 
@@ -266,7 +267,7 @@ double defaultpx[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
 
 
 
-//uncomment this when skipping loading the eeprom 
+//uncomment this when skipping loading the eeprom
 /*double px[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                   LF_SOAK_TIME, LF_SOAK_RAMP_TEMP, LF_REFLOW_TEMP_HOLFOFF, LF__REFLOW_TEMP,
                   LF_REFLOW_TIME, PB_SOAK_TEMP_HOLDOFF, PB_SOAK_TEMP, PB_SOAK_TIME,
@@ -410,7 +411,7 @@ void loop() {
 
     // If any thermocouple fault is detected
     if ((fault || (input < 10)))  // i think thermoCouple.read() returns a non zero value if there is a fault, TEST THIS!!!!!
-    {                             // also check to see if tempature returned was -999, if so that is a fault. Probably check for < 10C would be better
+    {                             // also check to see if tempature returned was  < 10C
       // Illegal operation
       reflowState = ERROR;  //error state
       reflowStatus = OFF;   //heat off
@@ -584,7 +585,7 @@ void loop() {
           reflowState = TOO_HOT;
           break;
         }
-        doorServo.write(0);          //servo  to door close 
+        doorServo.write(0);  //servo  to door close
         // If switch is pressed to start reflow process
         if (button && (reflowProfile != PROGRAM_MODE)) {
           // Send header for CSV file
@@ -672,18 +673,34 @@ void loop() {
 
       case SOAK:  //****************************************SOAK
 
-        if (input >= soakTemp - 10 && currentFunction != MAINTAIN) {
+        if (input >= soakTemp - 10 && currentFunction == COAST) {  //start timer if within soak limits
           soakTimer = millis();
         }
         switch (currentFunction) {
           case COAST:
-            if (input >= soakTemp) {
-              setpoint = soakTemp;
-              currentFunction = MAINTAIN;
-            } else if (input - lastTemp <= .4) {
-              setpoint = input + 4;
+            if (input >= soakTemp) {  //if we are at soak temp
+              setpoint = soakTemp;    //
+              if (soakTempRamp < 1) {
+                currentFunction = MAINTAIN;
+              } else {
+                currentFunction = SLOPE;
+              }
+            } else if (input - lastTemp <= .4) {  //catch is not delta T not high enough
+              setpoint = input + 4;               //if so add a bit of setpoint.
             }
             break;
+
+          case SLOPE:
+            if (millis() > soakTimer + soakTime) {
+              reflowOvenPIDmain.SetTunings(px[PID_P_REFLOW], px[PID_I_REFLOW], px[PID_D_REFLOW]);
+              setpoint = input + 20;
+              reflowState = REFLOW;
+              currentFunction = INTERCEPT;
+            } else {
+              setpoint += soakTempRamp / (soakTime / 1000);  //increment the setpoint for the amount each second.
+            }
+            break;
+
 
           case MAINTAIN:
             if (millis() > soakTimer + soakTime) {
@@ -778,7 +795,7 @@ void loop() {
         Serial.println(F("Thermocouple failed, Heaters shutdown, controll locked"));
         digitalWrite(SSR_MAIN, LOW);  //shut elements off
         reflowState = IDLE;           //write error to oled
-        for (;;)
+        for (;;);
           break;
       //**********************Programming mode handeling
       case PROGRAM:
@@ -982,7 +999,7 @@ void loop() {
           px[29] = 0;
         }
 
-        if (px[30] != 0) {                //write parameters to eeprom
+        if (px[30] != 0) {                 //write parameters to eeprom
           for (int i = 0; i <= 30; i++) {  //this loop loads eeprom
             if (i < 27) {
               EEPROM.put(EEPROM_STORAGE_ADDRESS + (i * 4), px[i]);  //this loads eeprom from parameters
@@ -998,7 +1015,6 @@ void loop() {
         break;
     }
   }  // Reflow oven controller state machine ********** END
-
 
   // PID computation and SSR control  ********************************************************* START
   if (reflowStatus == ON) {  //here is the element control we need to modify for boost element.
@@ -1043,16 +1059,16 @@ void onEb1Clicked(EncoderButton& eb) {
 void onEb1Encoder(EncoderButton& eb) {
   // Only can switch reflow profile during idle
   encoder += eb.increment();
-  if (reflowState == IDLE) {     // only if in idle
+  if (reflowState == IDLE) {                     // only if in idle
     int profile = 10 + reflowProfile + encoder;  //add 10 to remove possable neg #
-    if (profile > 12) {     //roll over
+    if (profile > 12) {                          //roll over
       profile -= 3;
     }
-    if (profile < 10) {     //roll under
+    if (profile < 10) {  //roll under
       profile += 3;
     }
-    reflowProfile = profile - 10;   //set profile, less the 10
-    encoder = 0;    //clear encoder valus to fix menu jumping when entering prog mode 
+    reflowProfile = profile - 10;  //set profile, less the 10
+    encoder = 0;                   //clear encoder valus to fix menu jumping when entering prog mode
   }
 }
 
