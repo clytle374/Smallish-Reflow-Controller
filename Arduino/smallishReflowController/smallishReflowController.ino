@@ -1,7 +1,7 @@
-#define version 35
+#define version 37
 
 /*Title: Smallish Reflow Controller
-  Date: 03-31-2024
+  Date: 04-26-2024
   Author: Cory Lytle  KO4SWI
 
   This code was taken from Tiny Reflow Controller and adapted and modified, only 
@@ -21,6 +21,8 @@
   V34 clean, fix menus still, removed dead code,  
   V35 deleting extra junk, a few misc bugs
   V36 more cleanup, removed hardcoded values, work on soak ramp option
+  V37 test and fix changes from above.  Need to figure out servo parameters.
+  //^^ closed degrees.  Max open degrees. Open for cool ramp for both lead and ROHS?
   */
 
 
@@ -76,8 +78,10 @@
 #define ROHS_REFLOW_TEMP_HOLDOFF 5  //^^ parameter number
 #define LF__REFLOW_TEMP 250         //reflow temp
 #define ROHS_REFLOW_TEMP 6          //^^ parameter number
-#define LF_REFLOW_TIME 6000         //reflow time
+#define LF_REFLOW_TIME 60000        //reflow time
 #define ROHS_REFLOW_TIME 7          //^^ parameter number
+#define ROHS_DOOR_OPEN_DEG 90       //how far to open the door
+#define ROHS_DOOR 1                 //
 
 // ***** LEADED PROFILE CONSTANTS *****
 #define PB_SOAK_TEMP_HOLDOFF 25      //cut heater before reaching soak
@@ -94,38 +98,44 @@
 #define LEAD_REFLOW_TEMP 13          //^^ parameter number
 #define PB_REFLOW_TIME 60000         //reflow time
 #define LEAD_REFLOW_TIME 14          //^^ parameter number
+#define PB_DOOR_OPEN_DEG 90          //how far to open the door
+#define LEAD_DOOR 1                  //^^ parameter number
 
 
 // ***** PID PARAMETERS *****
 // ***** PRE-HEAT *****
-#define PID_KP_PREHEAT_MAIN 200    //parameter10
-#define PID_P_PREHEAT 15           //^^ parameter number
+#define PID_KP_PREHEAT_MAIN 175   //parameter10
+#define PID_P_PREHEAT 15          //^^ parameter number
 #define PID_KI_PREHEAT_MAIN 0.025  //parameter11
-#define PID_I_PREHEAT 16           //^^ parameter number
-#define PID_KD_PREHEAT_MAIN 100    //parameter12
-#define PID_D_PREHEAT 17           //^^ parameter number
+#define PID_I_PREHEAT 16          //^^ parameter number
+#define PID_KD_PREHEAT_MAIN 100   //parameter12
+#define PID_D_PREHEAT 17          //^^ parameter number
 
 // ***** SOAK *****
-#define PID_KP_SOAK_MAIN 200   //parameter16
+#define PID_KP_SOAK_MAIN 175   //parameter16
 #define PID_P_SOAK 18          //^^ parameter number
-#define PID_KI_SOAK_MAIN 0.05  // parameter17
+#define PID_KI_SOAK_MAIN 0.025  // parameter17
 #define PID_I_SOAK 19          //^^ parameter number
 #define PID_KD_SOAK_MAIN 100   //parameter18
 #define PID_D_SOAK 20          //^^ parameter number
 
 // ***** REFLOW STAGE *****
-#define PID_KP_REFLOW_MAIN 200    // parameter22
-#define PID_P_REFLOW 21           //^^ parameter number
+#define PID_KP_REFLOW_MAIN 175   // parameter22
+#define PID_P_REFLOW 21          //^^ parameter number
 #define PID_KI_REFLOW_MAIN 0.025  //parameter23
-#define PID_I_REFLOW 22           //^^ parameter number
-#define PID_KD_REFLOW_MAIN 100    //parameter24
-#define PID_D_REFLOW 23           //^^ parameter number
+#define PID_I_REFLOW 22          //^^ parameter number
+#define PID_KD_REFLOW_MAIN 100   //parameter24
+#define PID_D_REFLOW 23          //^^ parameter number
 
 //others
 #define MAX_ON_MAIN 100           // % limit max ontime of element 0-100 // parameter28
 #define MAX_HEATER_ON 24          //^^ parameter number
 #define TEMPERATURE_COOL_MIN 100  //min temp to complete cool
 #define COOL_TEMP 25              //^^ parameter number
+#define DOOR_CLOSED_DEG 0         // what servo angle closes door
+#define DOOR_CLOSE 1              //^^ parameter number
+#define DOOR_FULL_OPEN_DEG 180    //max door opening.
+#define DOOR_MAX 1                //^^ parameter number
 
 // ****** serial speed ********
 #define SERIAL_SPEED 115200  //serial com speed parameter 36
@@ -191,7 +201,7 @@ unsigned long nextCheck;    // time keeping variable
 unsigned long nextRead;     //next read of thermouple
 unsigned long updateLcd;    //display update interval
 unsigned long systemTimer;  //timer for running everything in run modes
-unsigned long lastTemp;     //chatch if temp isn't coasting up
+unsigned long lastTemp;     //temp last scan
 unsigned long soakTimer;    //timer for soaking
 unsigned long reflowTimer;  //timer for relow
 unsigned long buzzerPeriod;
@@ -225,6 +235,7 @@ bool edit = 1;               // sw back to edit mode
 bool menuSpecial = 0;        // menus that behave diffrently get this
 int menuYes = 0;             // IDK, look into this
 int currentBaudPointer = 0;  // pointer for selecting baudrates from list, should be local?
+double deltaTemp;
 double px[31];               //parameters
 
 
@@ -244,30 +255,73 @@ const char* lcdMessagesReflowStatus[] = {  //text for display
 
 // these are the texts for the menu.
 const char menuOptions[][4] = { "NO", "YES" };  //display for ON/OFF menu options
-const char parameterNames[][24] = { "TEMPERATURE_ROOM", "LF_SOAK_TEMP_HOLDOFF",
-                                    "LF_SOAK_TEMP", "LF_SOAK_TIME", "LF_SOAK_RAMP_TEMP",
-                                    "LF_REFLOW_TEMP_HOLFOF", "LF__REFLOW_TEMP", "LF_REFLOW TIME",
-                                    "PB_SOAK_TEMP_HOLDOFF", "PB_SOAK_TEMP", "PB_SOAK_TIME", "PB_SOAK_RAMP_TEMP",
-                                    "PB_REFLOW_TEMP_HOLDOF", "PB_REFLOW_TEMP", "PB_REFLOW_TIME", "PID_KP_PREHEAT_MAIN",
-                                    "PID_KI_PREHEAT_MAIN", "PID_KD_PREHEAT_MAIN", "PID_KP_SOAK_MAIN", "PID_KI_SOAK_MAIN",
-                                    "PID_KD_SOAK_MAIN", "PID_KP_REFLOW_MAIN", "PID_KI_REFLOW_MAIN", "PID_KD_REFLOW_MAIN",
-                                    "MAX_ON_MAIN", "TEMPERATURE_COOL_MIN", "SERIAL_SPEED", "EXIT", "DUMP_TO_SERIAL",
-                                    "LOAD_DEFAULT_SETTINGS", "SAVE_TO_EEPROM" };
+const char parameterNames[][35] = { "TEMPERATURE_ROOM",
+                                    "LF_SOAK_TEMP_HOLDOFF",
+                                    "LF_SOAK_TEMP",
+                                    "LF_SOAK_TIME",
+                                    "LF_SOAK_RAMP_TEMP",
+                                    "LF_REFLOW_TEMP_HOLFOFF",
+                                    "LF__REFLOW_TEMP",
+                                    "LF_REFLOW TIME",
+                                    "PB_SOAK_TEMP_HOLDOFF",
+                                    "PB_SOAK_TEMP",
+                                    "PB_SOAK_TIME",
+                                    "PB_SOAK_RAMP_TEMP     0 for no ramp",
+                                    "PB_REFLOW_TEMP_HOLDOFF",
+                                    "PB_REFLOW_TEMP",
+                                    "PB_REFLOW_TIME",
+                                    "PID_KP_PREHEAT_MAIN    ",
+                                    "PID_KI_PREHEAT_MAIN",
+                                    "PID_KD_PREHEAT_MAIN",
+                                    "PID_KP_SOAK_MAIN",
+                                    "PID_KI_SOAK_MAIN",
+                                    "PID_KD_SOAK_MAIN",
+                                    "PID_KP_REFLOW_MAIN",
+                                    "PID_KI_REFLOW_MAIN",
+                                    "PID_KD_REFLOW_MAIN",
+                                    "MAX_ON_MAIN           1 to 100%",
+                                    "TEMPERATURE_COOL_MIN",
+                                    "SERIAL_SPEED",
+                                    "EXIT",
+                                    "DUMP_TO_SERIAL",
+                                    "LOAD_DEFAULT_SETTINGS",
+                                    "SAVE_TO_EEPROM" };
 
 
 //this will load the defaults parameters.. menu will use to load to defaults
 
-double defaultpx[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
-                         LF_SOAK_TIME, LF_SOAK_RAMP_TEMP, LF_REFLOW_TEMP_HOLFOFF, LF__REFLOW_TEMP,
-                         LF_REFLOW_TIME, PB_SOAK_TEMP_HOLDOFF, PB_SOAK_TEMP, PB_SOAK_TIME,
-                         PB_SOAK_RAMP_TEMP, PB_REFLOW_TEMO_HOLDOFF, PB_REFLOW_TEMP, PB_REFLOW_TIME,
-                         PID_KP_PREHEAT_MAIN, PID_KI_PREHEAT_MAIN, PID_KD_PREHEAT_MAIN, PID_KP_SOAK_MAIN,
-                         PID_KI_SOAK_MAIN, PID_KD_SOAK_MAIN, PID_KP_REFLOW_MAIN, PID_KI_REFLOW_MAIN,
-                         PID_KD_REFLOW_MAIN, MAX_ON_MAIN, TEMPERATURE_COOL_MIN, SERIAL_SPEED };
+double defaultpx[31] = { TEMPERATURE_ROOM,
+                         LF_SOAK_TEMP_HOLDOFF,
+                         LF_SOAK_TEMP,
+                         LF_SOAK_TIME,
+                         LF_SOAK_RAMP_TEMP,
+                         LF_REFLOW_TEMP_HOLFOFF,
+                         LF__REFLOW_TEMP,
+                         LF_REFLOW_TIME,
+                         PB_SOAK_TEMP_HOLDOFF,
+                         PB_SOAK_TEMP,
+                         PB_SOAK_TIME,
+                         PB_SOAK_RAMP_TEMP,
+                         PB_REFLOW_TEMO_HOLDOFF,
+                         PB_REFLOW_TEMP,
+                         PB_REFLOW_TIME,
+                         PID_KP_PREHEAT_MAIN,
+                         PID_KI_PREHEAT_MAIN,
+                         PID_KD_PREHEAT_MAIN,
+                         PID_KP_SOAK_MAIN,
+                         PID_KI_SOAK_MAIN,
+                         PID_KD_SOAK_MAIN,
+                         PID_KP_REFLOW_MAIN,
+                         PID_KI_REFLOW_MAIN,
+                         PID_KD_REFLOW_MAIN,
+                         MAX_ON_MAIN,
+                         TEMPERATURE_COOL_MIN,
+                         SERIAL_SPEED };
 
 
 
 //uncomment this when skipping loading the eeprom
+// *******************   BROKEN    ****************
 /*double px[31] = { TEMPERATURE_ROOM, LF_SOAK_TEMP_HOLDOFF, LF_SOAK_TEMP,
                   LF_SOAK_TIME, LF_SOAK_RAMP_TEMP, LF_REFLOW_TEMP_HOLFOFF, LF__REFLOW_TEMP,
                   LF_REFLOW_TIME, PB_SOAK_TEMP_HOLDOFF, PB_SOAK_TEMP, PB_SOAK_TIME,
@@ -494,6 +548,13 @@ void loop() {
         oled.print(input);
         oled.print((char)247);
         oled.print(F("C"));
+        oled.setCursor(80, 15);
+        oled.print((char)0x1e);        
+        if (deltaTemp >= 0) oled.print(F(" "));
+        if (deltaTemp >= 10 || deltaTemp <= -10 ) oled.print(F(" "));
+        oled.print(deltaTemp);
+        oled.print((char)247);
+        oled.print(F("C"));
       }
 
 
@@ -529,7 +590,7 @@ void loop() {
       oled.setTextSize(1);
       oled.setCursor(0, 18);
       oled.print(parameterNames[programPointer]);  //really bad name? lol
-      oled.setCursor(30, 36);
+      oled.setCursor(30, 42);
       if (programPointer < 27) {
         while (shiftPlaces-- > 0)           //loop the number of time
           oled.print(F(" "));               //spaces for deciaml alignemnt
@@ -539,7 +600,7 @@ void loop() {
         oled.print(menuOptions[menuYes]);
       }
 
-      oled.setCursor(0, 28);
+      oled.setCursor(0, 36);
       if (edit && (menuPointer == 10)) {  //handle the pointer for parameter selection
         oled.print(F("^ ^ ^ ^ ^ ^ ^ ^ ^ ^ ^"));
       } else if (!edit && (menuPointer == 10)) {
@@ -548,7 +609,7 @@ void loop() {
         oled.print(F(" "));
       }
       if (menuPointer != 10) {   //are we editing parameter values?
-        oled.setCursor(30, 45);  //move cursor below target data value
+        oled.setCursor(30, 51);  //move cursor below target data value
         for (int i = 10; i > -1; i--) {
           if (i == 2) {
             oled.print(F(" "));
@@ -566,7 +627,7 @@ void loop() {
       }
 
       oled.setCursor(0, 54);  //show what parameter # is being edited
-      oled.print(F("Parameter #"));
+      oled.print(F("P#"));
       oled.print(programPointer);  //mostly for programming debug, but nice.
     }
 
@@ -579,6 +640,8 @@ void loop() {
   // Reflow oven controller state machine *************  START
   if (millis() > systemTimer) {
     systemTimer = millis() + 1000;
+    deltaTemp = input - lastTemp;
+    lastTemp = input;
     switch (reflowState) {
       case IDLE:  //****************************************IDLE
         if (input >= px[ROOM_TEMP]) {
@@ -636,8 +699,7 @@ void loop() {
           // Proceed to preheat stage
           reflowState = PREHEAT;
           currentFunction = INTERCEPT;
-          lastTemp = input;
-
+          
         } else if (button && (reflowProfile == PROGRAM_MODE)) {
           reflowState = PROGRAM;
           button = 0;
@@ -652,7 +714,7 @@ void loop() {
         reflowStatus = ON;
         switch (currentFunction) {
           case INTERCEPT:                 //find and intercept the ramp
-            if (input - lastTemp >= 2) {  //at 2C/s
+            if (deltaTemp  >= 2) {  //at 2C/s
               setpoint = input + 4;       //start 2C/s @4C higher
               currentFunction = RAMP;
             }
@@ -668,7 +730,6 @@ void loop() {
             }
             break;
         }
-        lastTemp = input;
         break;
 
       case SOAK:  //****************************************SOAK
@@ -685,8 +746,12 @@ void loop() {
               } else {
                 currentFunction = SLOPE;
               }
-            } else if (input - lastTemp <= .4) {  //catch is not delta T not high enough
-              setpoint = input + 4;               //if so add a bit of setpoint.
+            } else if (deltaTemp <= .4) {  //catch is not delta T not high enough
+              if (input + 4 > soakTemp) {
+                setpoint = soakTemp;
+              } else {
+                setpoint = input + 4;  //if so add a bit of setpoint.
+              }
             }
             break;
 
@@ -711,7 +776,6 @@ void loop() {
               break;
             }
         }
-        lastTemp = input;
         break;
 
       case REFLOW:  //****************************************REFLOW
@@ -723,7 +787,7 @@ void loop() {
 
         switch (currentFunction) {
           case INTERCEPT:
-            if (input - lastTemp >= 2) {
+            if (deltaTemp >= 2) {
               setpoint = input + 4;
               currentFunction = RAMP;
             }
@@ -741,8 +805,12 @@ void loop() {
             if (input >= reflowTemp) {
               setpoint = reflowTemp;
               currentFunction = MAINTAIN;
-            } else if (input - lastTemp <= .4) {
-              setpoint = input + 4;
+            } else if (deltaTemp <= .4) {
+              if (input + 4 > reflowTemp) {
+                setpoint = reflowTemp;
+              } else {
+                setpoint = input + 4;  //if so add a bit of setpoint.
+              }
             }
             break;
 
@@ -754,7 +822,6 @@ void loop() {
             }
             break;
         }
-        lastTemp = input;
         break;
 
       case COOL:  //****************************************COOL
@@ -795,8 +862,9 @@ void loop() {
         Serial.println(F("Thermocouple failed, Heaters shutdown, controll locked"));
         digitalWrite(SSR_MAIN, LOW);  //shut elements off
         reflowState = IDLE;           //write error to oled
-        for (;;);
-          break;
+        for (;;)
+          ;
+        break;
       //**********************Programming mode handeling
       case PROGRAM:
         systemTimer = millis() + 250;     //speed up loop if in menu responce
