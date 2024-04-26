@@ -18,7 +18,7 @@ Here is the basic setup of the reflow profiles.  There are 2 profiles(LEAD and R
 
 
 
-![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/6c69fa6e21b77d11785d1b0f0b822d51ea9b8408/images/reflowplot.png?raw=true "Parameters and useage")
+![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/423ee643de7cbcbdcfa11f0c58c11b50bf000d47/images/reflowplot.png?raw=true "Parameters and useage")
 
 
 
