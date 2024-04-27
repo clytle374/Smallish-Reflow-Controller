@@ -72,85 +72,89 @@
 #define ROHS_SOAK_TEMP_HOLDOFF 1
 #define LF_SOAK_TEMP 150            //soak set temp
 #define ROHS_SOAK_TEMP 2            //^^ parameter number
-#define LF_SOAK_START_TEMP 250      //start the timer here
-#define ROHS_SOAK_START_TEMP 1      //^^ parameter number
+#define LF_SOAK_START_TEMP 140      //start the timer here
+#define ROHS_SOAK_START_TEMP 3      //^^ parameter number
 #define LF_SOAK_TIME 60000          //set soak time
-#define ROHS_SOAK_TIME 3            //^^ parameter number
+#define ROHS_SOAK_TIME 4            //^^ parameter number
 #define LF_SOAK_RAMP_TEMP 0         //do we want to ramp tem pduring soak?
-#define ROHS_SOAK_TEMP_RAMP 4       //^^ parameter number
+#define ROHS_SOAK_TEMP_RAMP 5       //^^ parameter number
 #define LF_REFLOW_TEMP_HOLFOFF 20   //cut heater off before reflow temp
-#define ROHS_REFLOW_TEMP_HOLDOFF 5  //^^ parameter number
+#define ROHS_REFLOW_TEMP_HOLDOFF 6  //^^ parameter number
 #define LF__REFLOW_TEMP 250         //reflow temp
-#define ROHS_REFLOW_TEMP 6          //^^ parameter number
-#define LF_REFLOW_START_TEMP 250    //start the timer here
-#define ROHS_REFLOW_START_TEMP 1    //^^ parameter number
+#define ROHS_REFLOW_TEMP 7          //^^ parameter number
+#define LF_REFLOW_START_TEMP 240    //start the timer here
+#define ROHS_REFLOW_START_TEMP 8    //^^ parameter number
 #define LF_REFLOW_TIME 60000        //reflow time
-#define ROHS_REFLOW_TIME 7          //^^ parameter number
-#define ROHS_DOOR_OPEN_DEG 90       //how far to open the door
-#define LF_DOOR_OPEN_DEG 1          //
+#define ROHS_REFLOW_TIME 9          //^^ parameter number
+#define LF_DOOR_OPEN_DEG 90       //how far to open the door
+#define ROHS_DOOR_OPEN_DEG 10          //
 
 // ***** LEADED PROFILE CONSTANTS *****
 #define PB_SOAK_TEMP_HOLDOFF 25      //cut heater before reaching soak
-#define LEAD_SOAK_TEMP_HOLDOFF 8     //^^ parameter number
+#define LEAD_SOAK_TEMP_HOLDOFF 11     //^^ parameter number
 #define PB_SOAK_TEMP 150             //temp to soak
-#define LEAD_SOAK_TEMP 9             //^^ parameter number
-#define PB_SOAK_START_TEMP 250       //start the timer here
-#define LEAD_SOAK_START_TEMP 1       //^^ parameter number
+#define LEAD_SOAK_TEMP 12             //^^ parameter number
+#define PB_SOAK_START_TEMP 140       //start the timer here
+#define LEAD_SOAK_START_TEMP 13       //^^ parameter number
 #define PB_SOAK_TIME 60000           //time to soak
-#define LEAD_SOAK_TIME 10            //^^ parameter number
+#define LEAD_SOAK_TIME 14            //^^ parameter number
 #define PB_SOAK_RAMP_TEMP 0          //do we want to ramp tem pduring soak?
-#define LEAD_SOAK_TEMP_RAMP 11       //^^ parameter number
+#define LEAD_SOAK_TEMP_RAMP 15       //^^ parameter number
 #define PB_REFLOW_TEMO_HOLDOFF 25    //cut heater before reflow
-#define LEAD_REFLOW_TEMP_HOLDOFF 12  //^^ parameter number
+#define LEAD_REFLOW_TEMP_HOLDOFF 16  //^^ parameter number
 #define PB_REFLOW_TEMP 224           //reflow temp
-#define LEAD_REFLOW_TEMP 13          //^^ parameter number
-#define PB_REFLOW_START_TEMP 250     //start the timer here
-#define LEAD_REFLOW_TIMER_TEMP 1     //^^ parameter number
+#define LEAD_REFLOW_TEMP 17          //^^ parameter number
+#define PB_REFLOW_START_TEMP 240     //start the timer here
+#define LEAD_REFLOW_TIMER_TEMP 18     //^^ parameter number
 #define PB_REFLOW_TIME 60000         //reflow time
-#define LEAD_REFLOW_TIME 14          //^^ parameter number
+#define LEAD_REFLOW_TIME 19          //^^ parameter number
 #define PB_DOOR_OPEN_DEG 90          //how far to open the door
-#define LEAD_DOOR_OPEN_DEG 1         //^^ parameter number
+#define LEAD_DOOR_OPEN_DEG 20         //^^ parameter number
 
 
 // ***** PID PARAMETERS *****
 // ***** PRE-HEAT *****
 #define PID_KP_PREHEAT_MAIN 175    //parameter10
-#define PID_P_PREHEAT 15           //^^ parameter number
+#define PID_P_PREHEAT 21           //^^ parameter number
 #define PID_KI_PREHEAT_MAIN 0.025  //parameter11
-#define PID_I_PREHEAT 16           //^^ parameter number
-#define PID_KD_PREHEAT_MAIN 100    //parameter12
-#define PID_D_PREHEAT 17           //^^ parameter number
+#define PID_I_PREHEAT 22           //^^ parameter number
+#define PID_KD_PREHEAT_MAIN 150    //parameter12
+#define PID_D_PREHEAT 23           //^^ parameter number
 
 // ***** SOAK *****
 #define PID_KP_SOAK_MAIN 175    //parameter16
-#define PID_P_SOAK 18           //^^ parameter number
+#define PID_P_SOAK 24           //^^ parameter number
 #define PID_KI_SOAK_MAIN 0.025  // parameter17
-#define PID_I_SOAK 19           //^^ parameter number
-#define PID_KD_SOAK_MAIN 100    //parameter18
-#define PID_D_SOAK 20           //^^ parameter number
+#define PID_I_SOAK 25           //^^ parameter number
+#define PID_KD_SOAK_MAIN 150    //parameter18
+#define PID_D_SOAK 26           //^^ parameter number
 
 // ***** REFLOW STAGE *****
 #define PID_KP_REFLOW_MAIN 175    // parameter22
-#define PID_P_REFLOW 21           //^^ parameter number
+#define PID_P_REFLOW 27           //^^ parameter number
 #define PID_KI_REFLOW_MAIN 0.025  //parameter23
-#define PID_I_REFLOW 22           //^^ parameter number
-#define PID_KD_REFLOW_MAIN 100    //parameter24
-#define PID_D_REFLOW 23           //^^ parameter number
+#define PID_I_REFLOW 28           //^^ parameter number
+#define PID_KD_REFLOW_MAIN 150    //parameter24
+#define PID_D_REFLOW 29           //^^ parameter number
 
 //others
 #define MAX_ON_MAIN 100           // % limit max ontime of element 0-100 // parameter28
-#define MAX_HEATER_ON 24          //^^ parameter number
+#define MAX_HEATER_ON 30          //^^ parameter number
 #define TEMPERATURE_COOL_MIN 100  //min temp to complete cool
-#define COOL_TEMP 25              //^^ parameter number
+#define COOL_TEMP 31              //^^ parameter number
 #define DOOR_CLOSED_DEG 0         // what servo angle closes door
-#define DOOR_CLOSE 1              //^^ parameter number
+#define DOOR_CLOSE 32              //^^ parameter number
 #define DOOR_FULL_OPEN_DEG 180    //max door opening.
-#define DOOR_MAX 1                //^^ parameter number
+#define DOOR_MAX 33                //^^ parameter number
 
 // ****** serial speed ********
 #define SERIAL_SPEED 115200  //serial com speed parameter 36
-#define SERIAL_BAUD 26       //^^ parameter number
+#define SERIAL_BAUD 34        //^^ parameter number
 //********** end paramters saved in eeprom *****************
+#define EXIT 35
+#define DUMP_TO_SERIAL 36
+#define LOAD_DEFAULTS  37
+#define SAVE_TO_EEPROM 38
 
 
 //Pin assignments
@@ -246,7 +250,7 @@ bool menuSpecial = 0;        // menus that behave diffrently get this
 int menuYes = 0;             // IDK, look into this
 int currentBaudPointer = 0;  // pointer for selecting baudrates from list, should be local?
 double deltaTemp;
-double px[31];  //parameters
+double px[41];  //parameters
 
 
 
@@ -268,18 +272,24 @@ const char menuOptions[][4] = { "NO", "YES" };  //display for ON/OFF menu option
 const char* parameterNames[] = { "TEMPERATURE_ROOM",
                                  "LF_SOAK_TEMP_HOLDOFF",
                                  "LF_SOAK_TEMP",
+                                 "LF_SOAK_START_TEMP",
                                  "LF_SOAK_TIME",
                                  "LF_SOAK_RAMP_TEMP",
                                  "LF_REFLOW_TEMP_HOLFOF",
                                  "LF__REFLOW_TEMP",
+                                 "LF_REFLOW_START_TEMP",
                                  "LF_REFLOW TIME",
+                                 "LF_DOOR_OPEN_DEG",
                                  "PB_SOAK_TEMP_HOLDOFF",
                                  "PB_SOAK_TEMP",
+                                 "PB_SOAK_START_TEMP",
                                  "PB_SOAK_TIME",
                                  "PB_SOAK_RAMP_TEMP",
                                  "PB_REFLOW_TEMP_HOLDOF",
                                  "PB_REFLOW_TEMP",
+                                 "PB_REFLOW_START_TEMP",
                                  "PB_REFLOW_TIME",
+                                 "PB_DOOR_OPEN_DEG",
                                  "PID_KP_PREHEAT_MAIN ",
                                  "PID_KI_PREHEAT_MAIN",
                                  "PID_KD_PREHEAT_MAIN",
@@ -291,6 +301,8 @@ const char* parameterNames[] = { "TEMPERATURE_ROOM",
                                  "PID_KD_REFLOW_MAIN",
                                  "MAX_ON   1 to 100%",
                                  "TEMPERATURE_COOL_MIN",
+                                 "DOOR_CLOSED_DEG",
+                                 "DOOR_FULL_OPEN_DEG",
                                  "SERIAL_SPEED",
                                  "EXIT",
                                  "DUMP_TO_SERIAL",
@@ -308,21 +320,27 @@ const char* currentFunctionText[] = {
   "BOOST"
 };
 
-const double defaultpx[31] = { TEMPERATURE_ROOM,
+const double defaultpx[39] = { TEMPERATURE_ROOM,
                                LF_SOAK_TEMP_HOLDOFF,
                                LF_SOAK_TEMP,
+                               LF_SOAK_START_TEMP,
                                LF_SOAK_TIME,
                                LF_SOAK_RAMP_TEMP,
                                LF_REFLOW_TEMP_HOLFOFF,
                                LF__REFLOW_TEMP,
+                               LF_REFLOW_START_TEMP,
                                LF_REFLOW_TIME,
+                               LF_DOOR_OPEN_DEG,
                                PB_SOAK_TEMP_HOLDOFF,
                                PB_SOAK_TEMP,
+                               PB_SOAK_START_TEMP,
                                PB_SOAK_TIME,
                                PB_SOAK_RAMP_TEMP,
                                PB_REFLOW_TEMO_HOLDOFF,
                                PB_REFLOW_TEMP,
+                               PB_REFLOW_START_TEMP,
                                PB_REFLOW_TIME,
+                               PB_DOOR_OPEN_DEG,
                                PID_KP_PREHEAT_MAIN,
                                PID_KI_PREHEAT_MAIN,
                                PID_KD_PREHEAT_MAIN,
@@ -334,6 +352,8 @@ const double defaultpx[31] = { TEMPERATURE_ROOM,
                                PID_KD_REFLOW_MAIN,
                                MAX_ON_MAIN,
                                TEMPERATURE_COOL_MIN,
+                               DOOR_CLOSED_DEG,
+                               DOOR_FULL_OPEN_DEG,
                                SERIAL_SPEED };
 
 
@@ -614,7 +634,7 @@ void loop() {
       oled.setCursor(0, 18);
       oled.print(parameterNames[programPointer]);  //really bad name? lol
       oled.setCursor(30, 42);
-      if (programPointer < 27) {
+      if (programPointer < 35) {
         while (shiftPlaces-- > 0)           //loop the number of time
           oled.print(F(" "));               //spaces for deciaml alignemnt
         oled.print(px[programPointer], 4);  //menuPointer programPointer edit
@@ -893,28 +913,28 @@ void loop() {
         break;
       //**********************Programming mode handeling
       case PROGRAM:
-        systemTimer = millis() + 250;     //speed up loop if in menu responce
+        systemTimer = millis() + 250;     //speed up loop if in menu for responce
         if (edit && menuPointer == 10) {  //are we selecting the parameters
           programPointer += encoder;      //change pointer of parameter by encoder counts
           if (programPointer < 0) {       //did we hit bottom of list?
-            programPointer = 30;          // if so jump to top
+            programPointer = 38;          // if so jump to top
           }
-          if (programPointer > 30) {  //did we hit top of list?
+          if (programPointer > 38) {  //did we hit top of list?
             programPointer = 0;       //if so jump to bottom
           }
         }
-        if (lastPointer != programPointer && programPointer > 26 && programPointer != 26) {
+        if (lastPointer != programPointer && programPointer > 34 && programPointer != 34) {
           menuSpecial = 1;
           if (px[programPointer] == 0) {
             menuYes = 0;
           } else {
             menuYes = 1;
           }
-        } else if (programPointer < 30) {
+        } else if (programPointer < 38) {
           menuSpecial = 0;
         }
 
-        if (lastPointer != programPointer && programPointer == 26) {
+        if (lastPointer != programPointer && programPointer == 34) {
           while (px[programPointer] != baudRates[currentBaudPointer]) {
             currentBaudPointer++;
             if (currentBaudPointer > 14) {
@@ -926,14 +946,14 @@ void loop() {
 
         lastPointer = programPointer;
 
-        if (!edit && programPointer < 26) {  //are we in edit paramter values mode?
+        if (!edit && programPointer < 34) {  //are we in edit paramter values mode?
           menuPointer -= encoder;            //move pointer by encoder counts
           if (menuPointer > 10) {            //next 4 handle upwards rollover
             menuPointer = 0;
           } else if (menuPointer < 0) {
             menuPointer = 10;
           }
-        } else if (!edit && programPointer > 25) {
+        } else if (!edit && programPointer > 33) {
           if (encoder != 0 && menuPointer == 10) {  //next 4 handle downwards  rollover
             menuPointer = 7;
           } else if (encoder != 0) {
@@ -941,7 +961,7 @@ void loop() {
           }
         }
 
-        if (programPointer < 26 && edit && menuPointer != 10) {  //Is pointer inside the parameter value?
+        if (programPointer < 34 && edit && menuPointer != 10) {  //Is pointer inside the parameter value?
                                                                  //  double enc = encoder;
           menuSpecial = 0;                                       //not in special functions mode
           double Z = 0;
@@ -962,18 +982,18 @@ void loop() {
           if (px[programPointer] < 0) {         //catch negative parameter value
             px[programPointer] = 0;             //if so zero it out
           }
-        } else if (programPointer > 25 && edit && menuPointer != 10) {  //are we in the
+        } else if (programPointer > 33 && edit && menuPointer != 10) {  //are we in the
           menuSpecial = 1;                                              // special section of the menu?
           switch (programPointer) {                                     //figure out where we are and act accordanly
 
-            case 26:                          //serial speed toggle through real values
+            case SERIAL_BAUD:                          //serial speed toggle through real values
               currentBaudPointer -= encoder;  //move pointer by encoder counts
               if (currentBaudPointer > 13) {  //  handle rollover
                 currentBaudPointer = 0;
               } else if (currentBaudPointer < 0) {
                 currentBaudPointer = 13;
               }
-              px[programPointer] = baudRates[currentBaudPointer];
+              px[SERIAL_BAUD] = baudRates[currentBaudPointer];
               if (button) {
                 button = 0;
                 menuPointer = 10;  // move selector back to parameters
@@ -982,7 +1002,7 @@ void loop() {
               };
               break;
 
-            case 27:  //exit menu
+            case EXIT:  //exit menu
               if (encoder != 0) {
                 if (menuYes == 1) {
                   menuYes = 0;
@@ -991,14 +1011,14 @@ void loop() {
                 }
               }
               if (button) {
-                px[programPointer] = menuYes;
+                px[EXIT] = menuYes;
                 button = 0;
                 edit = 0;
                 menuSpecial = 0;
               };
               break;
 
-            case 28:  //dump to serial
+            case DUMP_TO_SERIAL:  //dump to serial
               if (encoder != 0) {
                 if (menuYes == 1) {
                   menuYes = 0;
@@ -1007,14 +1027,14 @@ void loop() {
                 }
               }
               if (button) {
-                px[programPointer] = menuYes;
+                px[DUMP_TO_SERIAL] = menuYes;
                 button = 0;
                 menuPointer = 10;  // move selector back to parameters
                 edit = 1;          // sw back to edit mode
               };
               break;
 
-            case 29:  //load default parameters
+            case LOAD_DEFAULTS:  //load default parameters
               if (encoder != 0) {
                 if (menuYes == 1) {
                   menuYes = 0;
@@ -1023,14 +1043,14 @@ void loop() {
                 }
               }
               if (button) {
-                px[programPointer] = menuYes;
+                px[LOAD_DEFAULTS] = menuYes;
                 button = 0;
                 menuPointer = 10;  // move selector back to parameters
                 edit = 1;          // sw back to edit mode
               };
               break;
 
-            case 30:  //save to eeprom
+            case SAVE_TO_EEPROM:  //save to eeprom
               if (encoder != 0) {
                 if (menuYes == 1) {
                   menuYes = 0;
@@ -1039,7 +1059,7 @@ void loop() {
                 }
               }
               if (button) {
-                px[programPointer] = menuYes;
+                px[SAVE_TO_EEPROM] = menuYes;
                 button = 0;
                 menuPointer = 10;  // move selector back to parameters
                 edit = 1;          // sw back to edit mode
@@ -1057,20 +1077,20 @@ void loop() {
         button = 0;   //clear button press
         encoder = 0;  //clear encoder count
 
-
-        if (px[27] != 0) {  //exit edit mode
-          px[27] = 0;
+///* 
+       if (px[EXIT] != 0) {  //exit edit mode
+          px[EXIT] = 0;
           reflowState = IDLE;  //reset to idle
           reflowStatus = OFF;
           menuPointer = 10;  // move selector back to parameters
           edit = 0;
           lastPointer = 55;  //set to out of range to trip rereading for YES/NO
-          px[27] = 0;
+          px[EXIT] = 0;
         }
 
-        if (px[28] != 0) {
+        if (px[DUMP_TO_SERIAL] != 0) {
           double x;  //this dumps eemprom to serial port
-          for (int i = 0; i <= 30; i++) {
+          for (int i = 0; i <= 38; i++) {
             Serial.print("Parameter[ ");
             Serial.print(i);
             Serial.print("] Name is ");
@@ -1081,37 +1101,37 @@ void loop() {
             EEPROM.get(EEPROM_STORAGE_ADDRESS + (i * 4), x);
             Serial.println(x, 3);  //was truncating .025 to .03 fix
           }
-          px[28] = 0;
+          px[DUMP_TO_SERIAL] = 0;
           lastPointer = 55;  //set to out of range to trip rereading for YES/NO
         }
 
-        if (px[29] != 0) {                //load default parameters
-          for (int i = 0; i < 27; i++) {  //clear the commands parameters
+        if (px[LOAD_DEFAULTS] != 0) {                //load default parameters
+          for (int i = 0; i < 35; i++) {  //clear the commands parameters
             px[i] = defaultpx[i];
           }
           Serial.begin(px[SERIAL_BAUD]);
-          px[29] = 0;
+          px[LOAD_DEFAULTS] = 0;
         }
 
-        if (px[30] != 0) {                 //write parameters to eeprom
-          for (int i = 0; i <= 30; i++) {  //this loop loads eeprom
-            if (i < 27) {
+        if (px[SAVE_TO_EEPROM] != 0) {                 //write parameters to eeprom
+          for (int i = 0; i <= 38; i++) {  //this loop loads eeprom
+            if (i < 35) {
               EEPROM.put(EEPROM_STORAGE_ADDRESS + (i * 4), px[i]);  //this loads eeprom from parameters
             } else {
               EEPROM.put(EEPROM_STORAGE_ADDRESS + (i * 4), 0);  //clear V25 junk
             }
           }
-          px[30] = 0;
+          px[SAVE_TO_EEPROM] = 0;
           lastPointer = 55;  //set to out of range to trip rereading for YES/NO
         }
 
-        //reflowState = IDLE;  //reset to idle
+        //reflowState = IDLE;  //reset to idle */
         break;
     }
   }  // Reflow oven controller state machine ********** END
 
   // PID computation and SSR control  ********************************************************* START
-  if (reflowStatus == ON) {  //here is the element control we need to modify for boost element.
+  if (reflowStatus == ON) {  //here is the element control
 
     now = millis();
 
