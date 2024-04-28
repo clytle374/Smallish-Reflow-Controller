@@ -69,7 +69,7 @@ typedef enum CURRENT_FUNCTION {  //functions for switch statments
   COAST,
   SLOPE,
   MAINTAIN,
-  BOOST,
+  RECOVER,
 } currentFunction_t;
 
 typedef enum REFLOW_STATUS {  //reflow yes or no, why not bool?
@@ -97,11 +97,11 @@ unsigned long nextCheck;    // time keeping variable
 unsigned long nextRead;     //next read of thermouple
 unsigned long updateLcd;    //display update interval
 unsigned long systemTimer;  //timer for running everything in run modes
-unsigned long lastTemp;     //temp last scan
 unsigned long soakTimer;    //timer for soaking
 unsigned long reflowTimer;  //timer for relow
 unsigned long buzzerPeriod;
-
+unsigned long recoverTimer;  
+double  lastTemp;     //temp last scan
 
 //these are used to pass the diffrent ROHS or lead parameters to the system
 unsigned long soakTempHoldoff;  //cut before we get to temp
@@ -114,6 +114,7 @@ unsigned long reflowTemp;
 unsigned long reflowStartTemp;
 unsigned long reflowTime;
 unsigned long doorOpen;
+ 
 
 reflowState_t reflowState;          // Reflow oven controller state machine state variable
 reflowStatus_t reflowStatus;        // Reflow oven controller status
@@ -139,7 +140,7 @@ double px[41];  //parameters
 
 
 // ***** LCD MESSAGES *****
-const char* lcdMessagesReflowStatus[] = {  //text for display
+const char* lcdMessagesReflowStatus[] = {  //text for display 
   "Ready",
   "Pre",
   "Soak",
@@ -148,7 +149,7 @@ const char* lcdMessagesReflowStatus[] = {  //text for display
   "Done!",
   "Hot!",
   "Error",
-  "Program"
+  "Prog"
 };
 
 // these are the texts for the menu.
@@ -194,8 +195,8 @@ const char* parameterNames[] = { "TEMPERATURE_ROOM",
                                  "SAVE_TO_EEPROM" };
 
 
-//this will load the defaults parameters.. menu will use to load to defaults
-const char* currentFunctionText[] = {
+
+const char* currentFunctionText[] = {  //names for Functions
   "INTERCEPT",
   "RAMP",
   "COAST",
@@ -203,7 +204,7 @@ const char* currentFunctionText[] = {
   "MAINTAIN",
   "BOOST"
 };
-
+//this will load the defaults parameters.. menu will use to load to defaults
 const double defaultpx[41] = { TEMPERATURE_ROOM,
                                LF_SOAK_TEMP_HOLDOFF,
                                LF_SOAK_TEMP,
@@ -356,7 +357,7 @@ void setup() {
 
   digitalWrite(LED_PIN, LOW);  // Turn off LED
 
-  windowSize = 2000;  // Set window size
+  windowSize = 1000;  // Set window size
 
   nextCheck = millis();  // Initialize time keeping variable
 
@@ -386,8 +387,9 @@ void loop() {
     if (samples >= 4) {
       input = (inputRaw[0] + inputRaw[1] + inputRaw[2] + inputRaw[3]) / 4;
       samples = 0;
+      deltaTemp = input - lastTemp;
+      lastTemp = input;
     }
-
 
     // If any thermocouple fault is detected
     if ((fault || (input < 10)))  // i think thermoCouple.read() returns a non zero value if there is a fault, TEST THIS!!!!!
@@ -417,9 +419,9 @@ void loop() {
       Serial.print(F(" "));
       Serial.print(setpoint);
       Serial.print(F(" "));
-      Serial.println(input); /*
+      Serial.print(input); 
       Serial.print(F(" "));
-      Serial.print(outputMain);
+      Serial.println(outputMain/10);/*
       Serial.print(F(" "));
       Serial.println(outputBoost);*/
     } else {
@@ -483,8 +485,8 @@ void loop() {
         //oled.print(F(" "));
         if (deltaTemp >= 0) oled.print(F(" "));
         //if (deltaTemp <= 10 && deltaTemp >= -10 ) oled.print(F(" "));
-        oled.print(deltaTemp, 1);
-        oled.print((char)247);
+        oled.print(deltaTemp);
+        //oled.print((char)247);
         oled.print(F("C"));
       }
 
@@ -571,8 +573,8 @@ void loop() {
   // Reflow oven controller state machine *************  START
   if (millis() > systemTimer) {
     systemTimer = millis() + 1000;
-    deltaTemp = input - lastTemp;
-    lastTemp = input;
+    //deltaTemp = input - lastTemp;
+      //lastTemp = input;
     switch (reflowState) {
       case IDLE:  //****************************************IDLE
         if (input >= px[ROOM_TEMP]) {
@@ -634,8 +636,8 @@ void loop() {
           button = 0;
           setpoint = input + 20;
           // Proceed to preheat stage
-          soakTimer = 0;
-          reflowTimer = 0;
+          soakTimer = 0;  //make zero for test to avoid repeating
+          reflowTimer = 0;  //make zero for test to avoid repeating
           reflowState = PREHEAT;
           currentFunction = INTERCEPT;
 
@@ -654,7 +656,7 @@ void loop() {
         switch (currentFunction) {
           case INTERCEPT:            //find and intercept the ramp
             if (deltaTemp >= 2) {    //at 2C/s
-              setpoint = input + 4;  //start 2C/s @4C higher
+              setpoint = input + 10;  //start 2C/s @4C higher
               currentFunction = RAMP;
             }
             break;
@@ -728,7 +730,7 @@ void loop() {
         switch (currentFunction) {
           case INTERCEPT:
             if (deltaTemp >= 2) {
-              setpoint = input + 4;
+              setpoint = input + 10;
               currentFunction = RAMP;
             }
             break;

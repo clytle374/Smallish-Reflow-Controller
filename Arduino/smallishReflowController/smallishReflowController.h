@@ -11,7 +11,7 @@
 // ***** GENERAL PROFILE CONSTANTS *****
 #define PROFILE_TYPE_ADDRESS 0    //eeprom address for current profile
 #define EEPROM_STORAGE_ADDRESS 1  //eeprom address for everything else
-#define SENSOR_SAMPLING_TIME 250  // time for thermocouple reads, PC data out,
+#define SENSOR_SAMPLING_TIME 250  // time for thermocouple reads, DON'T CHANGE
 #define PID_SAMPLE_TIME 1000      //pid loop time
 
 //********** begin paramters saved in eeprom *****************
@@ -66,25 +66,25 @@
 
 // ***** PID PARAMETERS *****
 // ***** PRE-HEAT *****
-#define PID_KP_PREHEAT_MAIN 175    //parameter10
+#define PID_KP_PREHEAT_MAIN 125    //parameter10
 #define PID_P_PREHEAT 21           //^^ parameter number
-#define PID_KI_PREHEAT_MAIN 0.025  //parameter11
+#define PID_KI_PREHEAT_MAIN 0.015  //parameter11
 #define PID_I_PREHEAT 22           //^^ parameter number
 #define PID_KD_PREHEAT_MAIN 150    //parameter12
 #define PID_D_PREHEAT 23           //^^ parameter number
 
 // ***** SOAK *****
-#define PID_KP_SOAK_MAIN 175    //parameter16
+#define PID_KP_SOAK_MAIN 125    //parameter16
 #define PID_P_SOAK 24           //^^ parameter number
-#define PID_KI_SOAK_MAIN 0.025  // parameter17
+#define PID_KI_SOAK_MAIN 0.015  // parameter17
 #define PID_I_SOAK 25           //^^ parameter number
 #define PID_KD_SOAK_MAIN 150    //parameter18
 #define PID_D_SOAK 26           //^^ parameter number
 
 // ***** REFLOW STAGE *****
-#define PID_KP_REFLOW_MAIN 175    // parameter22
+#define PID_KP_REFLOW_MAIN 125    // parameter22
 #define PID_P_REFLOW 27           //^^ parameter number
-#define PID_KI_REFLOW_MAIN 0.025  //parameter23
+#define PID_KI_REFLOW_MAIN 0.015  //parameter23
 #define PID_I_REFLOW 28           //^^ parameter number
 #define PID_KD_REFLOW_MAIN 150    //parameter24
 #define PID_D_REFLOW 29           //^^ parameter number
