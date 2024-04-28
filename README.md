@@ -19,7 +19,7 @@ Why use those holdoff values?  I could not tune the PID of the system to not ove
 
 Results
 ![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/e3206c26fff62b9263a2f295be6cd4586ccee949/images/goodWminorRecovery.png?raw=true "Good Run")
-Blue= Setpoint      Orange= Temperature     Red= Output %
+Blue= Setpoint       Orange= Temperature        Red= Output %
 You can see the recovery right before the oven hits reflow temp. Below is an example of the TEMP_HOLDOFF values being too large making the reflow cycle too long.
 ![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/e3206c26fff62b9263a2f295be6cd4586ccee949/images/recover.png?raw=true "Too much Recovery")
 
