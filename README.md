@@ -18,10 +18,10 @@ At the end of the soak cycle a 2C/s ramp is started.  Just like the SOAK_TEMP_HO
 Why use those holdoff values?  I could not tune the PID of the system to not overshoot severely and hold a steady temperature. In researching this issue I found this quote “The unfortunate relationship between servo systems and oscillators is very apparent in thermal control systems.” by  Jim Williams
 
 Results
-https://github.com/clytle374/Smallish-Reflow-Controller/blob/e3206c26fff62b9263a2f295be6cd4586ccee949/images/goodWminorRecovery.png
+![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/e3206c26fff62b9263a2f295be6cd4586ccee949/images/goodWminorRecovery.png?raw=true "Good Run")
 Blue= Setpoint      Orange= Temperature     Red= Output %
-You can see the recovery right before the oven hits reflow temp. Below is an example of the TEMP_HOLDOFF values being too large.
-https://github.com/clytle374/Smallish-Reflow-Controller/blob/e3206c26fff62b9263a2f295be6cd4586ccee949/images/recover.png
+You can see the recovery right before the oven hits reflow temp. Below is an example of the TEMP_HOLDOFF values being too large making the reflow cycle too long.
+![Alt text](https://github.com/clytle374/Smallish-Reflow-Controller/blob/e3206c26fff62b9263a2f295be6cd4586ccee949/images/recover.png?raw=true "Too much Recovery")
 
 The oven is based on a $20 toaster oven from Walmart, 2 of them actually as the whole oven is cheaper than one heating element. Each oven has a 470 watt and 580 watt quartz elements.  The oven was fitted with an insert made from the second oven and aluminum flashing as the top half of the chamber for less heat mass. It was insulated with Kaowool, and cheap aluminum coated fiberglass adhesive on the inside. The quarts tubes were cut shorter with a diamond wheel in a dreamil tool and all 4 were put in the bottom, giving about 2KW.  In hindsight I would have tried using aluminum flashing with koawool across the bottom/back/top before I cut the elements. 4 holes were drilled though the oven sides and into the chamber.  Sheet metal screws were then used as stay bolts to hold it in place.  One of the element shields was used at the bottom front to protect the glass due to their close proximity.  It might not be needed, but it greatly stiffens the chamber.
 
