@@ -100,8 +100,8 @@ unsigned long systemTimer;  //timer for running everything in run modes
 unsigned long soakTimer;    //timer for soaking
 unsigned long reflowTimer;  //timer for relow
 unsigned long buzzerPeriod;
-unsigned long recoverTimer;  
-double  lastTemp;     //temp last scan
+unsigned long recoverTimer;
+double lastTemp;  //temp last scan
 
 //these are used to pass the diffrent ROHS or lead parameters to the system
 unsigned long soakTempHoldoff;  //cut before we get to temp
@@ -114,7 +114,7 @@ unsigned long reflowTemp;
 unsigned long reflowStartTemp;
 unsigned long reflowTime;
 unsigned long doorOpen;
- 
+
 
 reflowState_t reflowState;          // Reflow oven controller state machine state variable
 reflowStatus_t reflowStatus;        // Reflow oven controller status
@@ -140,7 +140,7 @@ double px[41];  //parameters
 
 
 // ***** LCD MESSAGES *****
-const char* lcdMessagesReflowStatus[] = {  //text for display 
+const char* lcdMessagesReflowStatus[] = {  //text for display
   "Ready",
   "Pre",
   "Soak",
@@ -202,7 +202,7 @@ const char* currentFunctionText[] = {  //names for Functions
   "COAST",
   "SLOPE",
   "MAINTAIN",
-  "BOOST"
+  "RECOVER"
 };
 //this will load the defaults parameters.. menu will use to load to defaults
 const double defaultpx[41] = { TEMPERATURE_ROOM,
@@ -419,9 +419,9 @@ void loop() {
       Serial.print(F(" "));
       Serial.print(setpoint);
       Serial.print(F(" "));
-      Serial.print(input); 
+      Serial.print(input);
       Serial.print(F(" "));
-      Serial.println(outputMain/10);/*
+      Serial.println(outputMain / 10); /*
       Serial.print(F(" "));
       Serial.println(outputBoost);*/
     } else {
@@ -480,13 +480,13 @@ void loop() {
         oled.print(input);
         oled.print((char)247);
         oled.print(F("C"));
-        oled.setCursor(85, 15);
+        oled.setCursor(50, 46);
         oled.print((char)0x1e);
         //oled.print(F(" "));
         if (deltaTemp >= 0) oled.print(F(" "));
         //if (deltaTemp <= 10 && deltaTemp >= -10 ) oled.print(F(" "));
         oled.print(deltaTemp);
-        //oled.print((char)247);
+        oled.print((char)247);
         oled.print(F("C"));
       }
 
@@ -574,7 +574,7 @@ void loop() {
   if (millis() > systemTimer) {
     systemTimer = millis() + 1000;
     //deltaTemp = input - lastTemp;
-      //lastTemp = input;
+    //lastTemp = input;
     switch (reflowState) {
       case IDLE:  //****************************************IDLE
         if (input >= px[ROOM_TEMP]) {
@@ -636,7 +636,7 @@ void loop() {
           button = 0;
           setpoint = input + 20;
           // Proceed to preheat stage
-          soakTimer = 0;  //make zero for test to avoid repeating
+          soakTimer = 0;    //make zero for test to avoid repeating
           reflowTimer = 0;  //make zero for test to avoid repeating
           reflowState = PREHEAT;
           currentFunction = INTERCEPT;
@@ -654,8 +654,8 @@ void loop() {
       case PREHEAT:  //****************************************PREHEAT
         reflowStatus = ON;
         switch (currentFunction) {
-          case INTERCEPT:            //find and intercept the ramp
-            if (deltaTemp >= 2) {    //at 2C/s
+          case INTERCEPT:             //find and intercept the ramp
+            if (deltaTemp >= 1.5) {     //at 2C/s
               setpoint = input + 10;  //start 2C/s @4C higher
               currentFunction = RAMP;
             }
@@ -688,13 +688,26 @@ void loop() {
                 currentFunction = SLOPE;
               }
             } else if (deltaTemp <= .4) {  //catch if delta T not high enough
-              if (input + 4 > soakTemp) {
+              if (input + 5 > soakTemp) {
                 setpoint = soakTemp;
               } else {
-                setpoint = input + 4;  //if so add a bit of setpoint.
+                currentFunction = RECOVER;  //if so add a bit of setpoint.
+                recoverTimer = millis();
+                setpoint = input + 5;
               }
             }
             break;
+
+          case RECOVER:
+            if (millis() > recoverTimer + 2000) {
+              setpoint = input - 3;
+              if (millis() > recoverTimer + 5000) {
+                currentFunction = COAST;
+              }
+            }
+            break;
+
+
 
           case SLOPE:
             if (millis() > soakTimer + soakTime) {
@@ -729,7 +742,7 @@ void loop() {
 
         switch (currentFunction) {
           case INTERCEPT:
-            if (deltaTemp >= 2) {
+            if (deltaTemp >= 1.5) {
               setpoint = input + 10;
               currentFunction = RAMP;
             }
@@ -748,10 +761,21 @@ void loop() {
               setpoint = reflowTemp;
               currentFunction = MAINTAIN;
             } else if (deltaTemp <= .4) {
-              if (input + 4 > reflowTemp) {
+              if (input + 5 > reflowTemp) {
                 setpoint = reflowTemp;
               } else {
-                setpoint = input + 4;  //if so add a bit of setpoint.
+                currentFunction = RECOVER;  //if so add a bit of setpoint.
+                recoverTimer = millis();
+                setpoint = input + 5;
+              }
+            }
+            break;
+
+          case RECOVER:
+            if (millis() > recoverTimer + 2000) {
+              setpoint = input - 3 ;
+              if (millis() > recoverTimer + 5000) {
+                currentFunction = COAST;
               }
             }
             break;
@@ -1005,7 +1029,7 @@ void loop() {
         }
 
         if (px[SAVE_TO_EEPROM] != 0) {                            //write parameters to eeprom
-          for (int i = 0; i < SAVE_TO_EEPROM; i++) {                         //this loop loads eeprom
+          for (int i = 0; i < SAVE_TO_EEPROM; i++) {              //this loop loads eeprom
             EEPROM.put(EEPROM_STORAGE_ADDRESS + (i * 4), px[i]);  //this loads eeprom from parameters
           }
           px[SAVE_TO_EEPROM] = 0;
