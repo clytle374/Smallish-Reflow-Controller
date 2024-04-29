@@ -161,7 +161,7 @@ const char* parameterNames[] = { "TEMPERATURE_ROOM",
                                  "LF_SOAK_TIME",
                                  "LF_SOAK_RAMP_TEMP",
                                  "LF_REFLOW_TEMP_HOLFOF",
-                                 "LF__REFLOW_TEMP",
+                                 "LF_REFLOW_TEMP",
                                  "LF_REFLOW_TIMER_TEMP",
                                  "LF_REFLOW TIME",
                                  "LF_DOOR_OPEN_DEG",
@@ -1035,6 +1035,26 @@ void loop() {
           px[SAVE_TO_EEPROM] = 0;
           lastPointer = 55;  //set to out of range to trip rereading for YES/NO
         }
+
+        //some nonsense settings cause chaos, catch them here
+        if(px[ROHS_SOAK_TIMER_TEMP] > px[ROHS_SOAK_TEMP]){
+          px[ROHS_SOAK_TIMER_TEMP] = px[ROHS_SOAK_TEMP];
+        }
+
+        if(px[LEAD_SOAK_TIMER_TEMP] > px[LEAD_SOAK_TEMP]){
+          px[LEAD_SOAK_TIMER_TEMP] = px[LEAD_SOAK_TEMP];
+        }
+
+        if(px[ROHS_REFLOW_TIMER_TEMP] > px[ROHS_REFLOW_TEMP]){
+          px[ROHS_REFLOW_TIMER_TEMP] = px[ROHS_REFLOW_TEMP];
+        }
+
+        if(px[LEAD_REFLOW_TIMER_TEMP] > px[LEAD_REFLOW_TEMP]){
+          px[LEAD_REFLOW_TIMER_TEMP] = px[LEAD_REFLOW_TEMP];
+        }
+
+
+
 
         break;
     }

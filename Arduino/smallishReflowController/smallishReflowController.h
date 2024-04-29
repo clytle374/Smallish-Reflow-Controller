@@ -56,7 +56,7 @@
 #define LEAD_REFLOW_TEMP_HOLDOFF 16  //^^ parameter number
 #define PB_REFLOW_TEMP 224           //reflow temp
 #define LEAD_REFLOW_TEMP 17          //^^ parameter number
-#define PB_REFLOW_TIMER_TEMP 240     //start the timer here
+#define PB_REFLOW_TIMER_TEMP 214     //start the timer here
 #define LEAD_REFLOW_TIMER_TEMP 18    //^^ parameter number
 #define PB_REFLOW_TIME 60000         //reflow time
 #define LEAD_REFLOW_TIME 19          //^^ parameter number
