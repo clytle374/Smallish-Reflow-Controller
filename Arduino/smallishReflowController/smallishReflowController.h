@@ -34,9 +34,9 @@
 #define ROHS_REFLOW_TEMP_HOLDOFF 6  //^^ parameter number
 #define LF__REFLOW_TEMP 250         //reflow temp
 #define ROHS_REFLOW_TEMP 7          //^^ parameter number
-#define LF_REFLOW_TIMER_TEMP 240    //start the timer here
+#define LF_REFLOW_TIMER_TEMP 230    //start the timer here
 #define ROHS_REFLOW_TIMER_TEMP 8    //^^ parameter number
-#define LF_REFLOW_TIME 60000        //reflow time
+#define LF_REFLOW_TIME 30000        //reflow time
 #define ROHS_REFLOW_TIME 9          //^^ parameter number
 #define LF_DOOR_OPEN_DEG 90         //how far to open the door
 #define ROHS_DOOR_OPEN_DEG 10       //
@@ -56,9 +56,9 @@
 #define LEAD_REFLOW_TEMP_HOLDOFF 16  //^^ parameter number
 #define PB_REFLOW_TEMP 224           //reflow temp
 #define LEAD_REFLOW_TEMP 17          //^^ parameter number
-#define PB_REFLOW_TIMER_TEMP 214     //start the timer here
+#define PB_REFLOW_TIMER_TEMP 204     //start the timer here
 #define LEAD_REFLOW_TIMER_TEMP 18    //^^ parameter number
-#define PB_REFLOW_TIME 60000         //reflow time
+#define PB_REFLOW_TIME 30000         //reflow time
 #define LEAD_REFLOW_TIME 19          //^^ parameter number
 #define PB_DOOR_OPEN_DEG 90          //how far to open the door
 #define LEAD_DOOR_OPEN_DEG 20        //^^ parameter number
