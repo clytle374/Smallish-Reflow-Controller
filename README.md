@@ -1,6 +1,5 @@
 # Smallish-Reflow-Controller
 
-This is under development. incomplete documentation, working, use at your own risk.
 
 This code started as Tiny Reflow Controller and adapted and modified https://github.com/rocketscream/TinyReflowController  While some of the original code still exists like much of the display, it was more of a teaching tool for me at this point.
 
